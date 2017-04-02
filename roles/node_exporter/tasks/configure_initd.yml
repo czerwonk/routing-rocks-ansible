@@ -1,0 +1,11 @@
+- name: Copy upstart config
+  copy: src=upstart.conf dest=/etc/init/node_exporter.conf
+
+- name: Link upstart-config
+  file: src=/lib/init/upstart-job dest=/etc/init.d/node_exporter state=link
+
+- name: Configure auto start
+  service: name=node_exporter enabled=yes
+
+- name: Start node-exporter
+  service: name=node_exporter state=started

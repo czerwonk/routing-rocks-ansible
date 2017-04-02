@@ -1,0 +1,16 @@
+[Unit]
+Description=Wireguard VPN
+StartLimitIntervalSec=0
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/etc/wireguard/start.sh
+ExecStop=/etc/wireguard/stop.sh
+RestartSec=2s
+Restart=on-failure
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

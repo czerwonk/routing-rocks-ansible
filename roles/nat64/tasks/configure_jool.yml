@@ -1,0 +1,15 @@
+---
+
+- name: Download newest version
+  get_url: url=https://github.com/NICMx/releases/raw/master/Jool/Jool-{{ jool_version }}.zip dest=/usr/src/jool-{{ jool_version }}.zip
+  register: jool_sources
+
+- include: 'build_jool.yml'
+  when: jool_sources.changed
+
+- name: Ensure module is configured
+  copy: dest=/etc/modules-load.d/jool.conf content="jool pool6=64:ff9b::/96" mode=0644 owner=root
+
+- name: Ensure kernel module is started
+  shell: modprobe jool pool6=64:ff9b::/96
+

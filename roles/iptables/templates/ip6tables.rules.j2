@@ -1,0 +1,46 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:DROP_INPUT - [0:0]
+:DROP_FORWARD - [0:0]
+-A DROP_INPUT -m limit --limit 2/min -j LOG --log-prefix "ip6tables drop: CHAIN=INPUT " --log-level 4
+-A DROP_INPUT -j DROP
+
+-A INPUT -p ipv6-icmp -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 2222 -j ACCEPT
+{% for peer in peerings.ipv6 | default([]) %}
+{% for session in peer.sessions %}
+-A INPUT -s {{ session.ip }} -p tcp -m tcp --dport 179 -j ACCEPT
+{% endfor %}
+{% endfor %}
+-A INPUT -i lo -j ACCEPT
+{% for iface in firewall.interfaces.inside | default([]) %}
+-A INPUT -i {{ iface }} -j ACCEPT
+{% endfor %}
+-A INPUT -i wg+ -j ACCEPT
+{% for interface in ospf.interfaces | default([]) %}
+-A INPUT -i {{ interface | replace('*', '+') }} -p ospf -j ACCEPT
+{% endfor %}
+-A INPUT -m conntrack --ctstate INVALID -j DROP_INPUT
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+-A INPUT -p udp -m udp --dport 60001:60999 -j ACCEPT
+{% for host in prometheus_hosts | default([]) %}
+-A INPUT -s {{ host }} -p tcp -m tcp --dport 9100 -j ACCEPT
+-A INPUT -s {{ host }} -p tcp -m tcp --dport 9200 -j ACCEPT
+{% endfor %}
+-A INPUT -j DROP_INPUT
+
+-A DROP_FORWARD -m limit --limit 2/min -j LOG --log-prefix "ip6tables drop: CHAIN=FORWARD " --log-level 4
+-A DROP_FORWARD -j DROP
+
+{% for p in prefixes.ipv6 | default([]) %}
+-A FORWARD -d {{ p }} -j ACCEPT
+-A FORWARD -s {{ p }} -j ACCEPT
+{% endfor %}
+{% for p in prefixes.downstream.ipv6 | default([]) %}
+-A FORWARD -d {{ p }} -j ACCEPT
+-A FORWARD -s {{ p }} -j ACCEPT
+{% endfor %}
+-A FORWARD -j DROP_FORWARD
+COMMIT

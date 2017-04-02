@@ -1,0 +1,33 @@
+{% for peering in peerings.ipv6 | default([]) %}
+{% for session in peering.sessions %}
+protocol bgp {{ session.name }} from generic_bgp {
+  neighbor {{ session.ip }} as {{ peering.asn }};
+{% if peering.source_ip is defined %}
+  source address {{ peering.source_ip }};
+{% endif %}
+{% if session.filters is defined %}
+  import filter {{ session.filters.import }};
+  export filter {{ session.filters.export }};
+{% else %}
+  import filter {{ peering.filters.import }};
+  export filter {{ peering.filters.export }};
+{% endif %}
+{% if peering.local_pref is defined %}
+  default bgp_local_pref {{ peering.local_pref }};
+{% endif %}
+{% if peering.multihop is defined %}
+  multihop {{ peering.multihop }};
+{% endif %}
+{% if peering.password is defined %}
+  password "{{ peering.password }}";
+{% endif %}
+{% if peering.rr_client | default(false) %}
+  rr client;
+{% endif %}
+{% if peering.hold_time is defined %}
+  hold time {{ peering.hold_time }};
+{% endif %}
+}
+
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,9 @@
+/var/log/bird.log {
+    size 10m
+    rotate 10
+    copytruncate
+    delaycompress
+    compress
+    notifempty
+    missingok
+}

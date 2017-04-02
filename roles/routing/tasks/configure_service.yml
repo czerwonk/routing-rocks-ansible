@@ -1,0 +1,13 @@
+---
+
+- name: Ensure systemd units exist
+  copy: src=bird6.service dest=/lib/systemd/system/bird6.service
+
+- name: Reload systemd configuration
+  shell: systemctl daemon-reload
+
+- name: Enable service
+  service: name=bird6 enabled=yes
+
+- name: Start if not started yet
+  service: name=bird6 state=started

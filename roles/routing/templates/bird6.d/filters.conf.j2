@@ -1,0 +1,255 @@
+function is_bogon() {
+  return net ~ [
+    ::/128,
+    ::1/128,
+    fc00::/7{7,128},
+    fe80::/10{10,128},
+    2001::/32{32,128},
+    2001:0002::/48{48,128},
+    2001:0010::/28{28,128},
+    2002::/16{16,128},
+    2001:db8::/32{32,128},
+    ff00::/8{8,128},
+    3ffe::/16{16,128}
+  ];
+}
+
+function is_default_route() {
+  return net = ::/0;
+}
+
+function is_own_prefix() {
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if net = {{ prefix }} then return true;
+{% endfor %}
+  return false;
+}
+
+function tag_origin() {
+  bgp_large_community.add({{ communities.origin }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.origin }});
+{% endif %}
+}
+
+function tag_upstream() {
+  bgp_large_community.add({{ communities.upstream_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.upstream_import }});
+{% endif %}
+}
+
+function tag_downstream() {
+  bgp_large_community.add({{ communities.downstream_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.downstream_import }});
+{% endif %}
+}
+
+function tag_peering() {
+  bgp_large_community.add({{ communities.peer_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.peer_import }});
+{% endif %}
+}
+
+function is_tagged_with_own_community() {
+  return bgp_large_community ~ [ ({{ asn }}, 0, *) ];
+}
+
+filter drain {
+  reject;
+}
+
+filter accept_all {
+  if DRAINED = 1 then reject;
+  accept;
+}
+
+filter full_view {
+  if DRAINED = 1 then reject;
+  if is_bogon() then reject;
+  if is_default_route() then reject;
+  
+  if net ~ [ ::/0{0,48} ] then {
+    accept;
+  }
+
+  reject;
+}
+
+filter ibgp_in {
+  if DRAINED = 1 then reject;
+  if net ~ [ {{ ibgp_prefix_filter }} ] then accept;
+  reject;
+}
+
+filter ibgp_out {
+  if DRAINED = 1 then reject;
+  if net = ::/0 then accept;
+  reject;
+}
+
+function should_announce_ebgp() {
+  if is_own_prefix() then {
+    tag_origin();
+    return true; 
+  }
+
+  if {{ communities.downstream_import }} ~ bgp_large_community then {
+    return true;
+  }
+
+  return false;
+}
+
+filter ebgp_out {
+  if DRAINED = 1 then reject;
+
+  if (should_announce_ebgp()) then {
+{% for i in range(path_prepend | default(0)) %}
+    bgp_path.prepend({{ asn }});
+{% endfor %}
+    accept;
+  }
+
+  reject;
+}
+
+filter ebgp_out_failsafe {
+  if DRAINED = 1 then reject;
+
+  if (should_announce_ebgp()) then {
+{% for i in range(path_prepend | default(0) + 3) %}
+    bgp_path.prepend({{ asn }});
+{% endfor %}
+
+    accept;
+  }
+  
+  reject;
+}
+
+filter upstream_in {
+  if DRAINED = 1 then reject;
+  if is_default_route() then reject;
+  if is_bogon() then reject;
+  if is_own_prefix() then reject;
+  if is_tagged_with_own_community() then reject;
+
+  tag_upstream();
+
+  accept;
+}
+
+{% for peer in peerings.ipv6 | default([]) %}
+{% if peer.accepted_prefixes is defined %}
+filter peer_as{{ peer.asn }}_in {
+  if DRAINED = 1 then reject;
+  if is_tagged_with_own_community() then reject;
+
+{% for p in peer.accepted_prefixes %}
+  if net ~ [ {{ p }} ] then {
+    tag_peering();
+{% if peer.downstream | default(false) %}
+    tag_downstream();
+{% endif %}
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}
+
+{% endif %}
+{% endfor %}
+filter bb_ibgp_in {
+  if DRAINED = 1 then reject;
+
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if net ~ [ {{ prefix }}{52,64} ] then {
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}
+
+filter site_ibgp_out {
+  if DRAINED = 1 then reject;
+
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ prefix }}{64,64} ] then {
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}
+
+filter bb_ibgp_out {
+  if DRAINED = 1 then reject;
+
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if source = RTS_STATIC && net ~ [ {{ prefix }}{52,64} ] then {
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}
+
+filter bb_ibgp_full_out {
+  if is_default_route() then reject;
+  
+  if net ~ [ ::/0{0,48} ] then {
+    accept;
+  }
+
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ prefix }}{52,64} ] then {
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}
+
+filter bb_ibgp_failsafe_in {
+  if is_default_route() then reject;
+  if is_bogon() then reject;
+  if is_own_prefix() then reject;
+
+  if {{ communities.peer_import }} ~ bgp_large_community then {
+    bgp_local_pref = 1000;
+  }
+  else {
+    bgp_local_pref = 5;
+  }
+
+  accept;
+}
+
+filter ospf_out {
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if source = RTS_DEVICE && net ~ [ {{ prefix }}{128,128} ] then {
+    accept;
+  }
+{% endfor %}
+
+  if source = RTS_STATIC && is_default_route() then {
+    accept;
+  }
+
+  reject;
+}
+
+filter ospf_in {
+{% for prefix in prefixes.ipv6 | default([]) %}
+  if net ~ [ {{ prefix }}{128,128} ] then {
+    accept;
+  }
+{% endfor %}
+
+  reject;
+}

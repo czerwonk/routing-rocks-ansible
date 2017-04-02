@@ -1,0 +1,29 @@
+acl allow-from {
+  localhost;
+{% for p in prefixes.ipv6 | default([]) %}
+  {{ p }};
+{% endfor %}
+  fe80::/10;
+};
+
+options {
+  directory "/var/cache/bind";
+
+  recursion yes;
+  allow-query { allow-from; };
+
+  forwarders {
+    2001:4860:4860::8888;
+    2001:4860:4860::8844;
+  };
+  
+  forward only;
+
+  dnssec-enable yes;
+  dnssec-validation yes;
+
+  auth-nxdomain no;    # conform to RFC1035
+  listen-on-v6 { any; };
+
+  dns64 64:ff9b::/96 { };
+};

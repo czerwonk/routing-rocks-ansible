@@ -1,0 +1,26 @@
+define ASN = {{ asn }};
+define DRAINED = 0;
+
+log syslog all;
+router id {{ router_id }};
+timeformat protocol "%s";
+
+protocol direct {
+  interface "*";
+};
+
+protocol kernel {
+  export filter {
+{% if source_ipv6 is defined %}
+    krt_prefsrc = {{ source_ipv6 }};
+{% endif %}
+    accept;
+  };
+};
+
+protocol device {
+  scan time 10;
+};
+
+include "{{ bird_config_dir }}/bgp.conf";
+include "{{ bird_config_dir }}/bird6.d/*.conf";

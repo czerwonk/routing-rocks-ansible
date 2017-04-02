@@ -1,0 +1,10 @@
+---
+
+- name: Extract source code
+  unarchive: 
+    src: /usr/src/jool-{{ jool_version }}.zip
+    dest: /usr/src
+    remote_src: true
+
+- name: Install module
+  shell: dkms install /usr/src/Jool-{{ jool_version }}

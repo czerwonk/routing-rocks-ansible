@@ -1,0 +1,8 @@
+template bgp generic_bgp {
+  local as {{ asn }};
+  enable route refresh on;
+  keepalive time 10;
+  hold time 30;
+  import keep filtered;
+  next hop self;  
+};

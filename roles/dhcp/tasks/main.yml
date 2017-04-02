@@ -1,0 +1,17 @@
+---
+
+- name: Ensure kea is installed
+  dnf: name=kea state=installed
+
+- name: Ensure key var directory exists
+  file: path=/var/kea state=directory mode=0755 owner=root
+
+- name: Ensure config is up to date
+  template: src=kea.conf.j2 dest=/etc/kea/kea.conf owner=root mode=0644
+  notify: Restart kea
+
+- name: Ensure service is enabled
+  service: name=kea-dhcp4 enabled=yes
+
+- name: Ensure service is running
+  service: name=kea-dhcp4 state=started

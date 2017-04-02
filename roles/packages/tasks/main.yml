@@ -1,0 +1,7 @@
+---
+
+- include: install_packages_freebsd.yml
+  when: ansible_os_family == "FreeBSD"
+
+- include: install_packages_fedora.yml
+  when: ansible_os_family == "RedHat"

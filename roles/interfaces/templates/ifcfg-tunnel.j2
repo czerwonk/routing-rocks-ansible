@@ -1,0 +1,9 @@
+DEVICE={{ iface.name }}
+BOOTPROTO=none
+ONBOOT=yes
+TYPE={{ iface.tunnel.proto }}
+MY_OUTER_IPADDR={{ iface.tunnel.local_ip }} 
+PEER_OUTER_IPADDR={{ iface.tunnel.remote_ip }}
+PEER_INNER_IPADDR={{ iface.tunnel.remote_inner_ip }}
+MY_INNER_IPADDR={{ iface.ipv4.address }}
+MTU=1400

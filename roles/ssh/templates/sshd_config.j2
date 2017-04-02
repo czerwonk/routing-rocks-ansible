@@ -1,0 +1,40 @@
+{% if sshd_port is defined %}
+Port {{ sshd_port }} 
+{% else %}
+Port 22
+{% endif %}
+
+KeyRegenerationInterval 1h
+
+# Logging
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+
+# Authentication:
+AllowGroups ssh
+LoginGraceTime 1m
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 3
+MaxSessions 5
+RSAAuthentication yes
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+UsePAM yes
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials no
+
+AllowAgentForwarding no
+AllowTcpForwarding no
+PrintMotd yes
+ChrootDirectory %h
+UseDNS no
+UsePrivilegeSeparation sandbox
+
+Subsystem sftp /usr/libexec/openssh/sftp-server
+
+Match User {{ user.name }}
+  AllowTcpForwarding yes
+  ChrootDirectory none

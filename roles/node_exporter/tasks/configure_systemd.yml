@@ -1,0 +1,8 @@
+- name: Create systemd unit
+  copy: src=systemd.service dest=/etc/systemd/system/node_exporter.service
+
+- name: Reload systemd
+  shell: systemctl daemon-reload
+
+- name: Start node-exporter
+  service: name=node_exporter state=started enabled=yes

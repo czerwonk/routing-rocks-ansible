@@ -1,0 +1,34 @@
+---
+
+- name: Ensure build requirements are met
+  dnf: name={{ item }} state=present
+  with_items:
+    - flex
+    - bison
+    - ncurses-devel
+    - readline-devel
+
+- name: Ensure build dir does not exist
+  file: path=/tmp/bird state=absent
+
+- name: Extract source code
+  unarchive:
+    src: "/usr/src/bird-{{ bird_version }}.tar.gz"
+    dest: /tmp
+    remote_src: true
+
+- name: Configure bird6 build
+  shell: cd /tmp/bird-{{ bird_version }} && ./configure --enable-ipv6 --sysconfdir=/etc/bird
+
+- make:
+    chdir: "/tmp/bird-{{ bird_version }}"
+    target: clean
+
+- name: Build bird6
+  make:
+    chdir: "/tmp/bird-{{ bird_version }}"
+
+- name: Install bird6
+  make:
+    chdir: "/tmp/bird-{{ bird_version }}"
+    target: install

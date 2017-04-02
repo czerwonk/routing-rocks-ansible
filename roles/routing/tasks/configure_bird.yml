@@ -1,0 +1,25 @@
+---
+
+- name: Ensure config directory exists
+  file: name={{ bird_config_dir }}/ owner=root mode=0755 state=directory
+
+- name: Ensure subdirs exists
+  file: name={{ bird_config_dir }}/bird6.d owner=root mode=0755 state=directory
+
+- name: Configure generic bgp
+  template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bgp.conf owner=root mode=0644
+  notify: Reconfigure bird6
+
+- name: Configure filters, peerings, etc.
+  template: src=bird6.d/{{ item }}.conf.j2 dest={{ bird_config_dir }}/bird6.d/{{ item }}.conf owner=root mode=0644
+  with_items:
+    - filters
+    - static
+    - peerings
+    - ospf
+  notify: Reconfigure bird6
+
+- name: Configure radv
+  template: src=bird6.d/radv.conf.j2 dest={{ bird_config_dir }}/bird6.d/radv.conf owner=root mode=0644
+  when: radv is defined
+  notify: Reconfigure bird6

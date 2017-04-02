@@ -1,0 +1,7 @@
+---
+
+- name: Reconfigure bird6
+  shell: /usr/local/sbin/birdc6 configure
+
+- name: Restart rsyslog
+  service: name=rsyslog state=restarted

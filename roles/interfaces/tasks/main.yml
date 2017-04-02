@@ -1,0 +1,61 @@
+---
+
+- name: Ensure post-up script exists
+  copy: src=ifup-local dest=/sbin/ifup-local mode=0755 owner=root
+
+- name: Ensure loopback is configured
+  template: src=ifcfg-lo.j2 dest=/etc/sysconfig/network-scripts/ifcfg-lo mode=0644 owner=root
+  notify: Restart network
+
+- name: Ensure ethernet interfaces are configured
+  template: src=ifcfg-eth.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  with_items: "{{ interfaces }}"
+  loop_control:
+    loop_var: "iface"
+  when: iface.type == 'Ethernet'
+  notify: Restart network
+
+- name: Ensure vlan interfaces are configured
+  template: src=ifcfg-vlan.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  with_items: "{{ interfaces }}"
+  loop_control:
+    loop_var: "iface"
+  when: iface.type == 'VLAN'
+  notify: Restart network
+
+- name: Ensure tunnel interfaces are configured
+  template: src=ifcfg-tunnel.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  with_items: "{{ interfaces }}"
+  loop_control:
+    loop_var: "iface"
+  when: iface.type == 'Tunnel'
+  notify: Restart network
+
+- name: Ensure tunnel IPv6 post-up scripts exist
+  template: src=postup.j2 dest=/etc/sysconfig/network-scripts/postup-{{ iface.name }} mode=0744 owner=root
+  with_items: "{{ interfaces }}"
+  loop_control:
+    loop_var: "iface"
+  when: iface.type == 'Tunnel' and iface.ipv6 is defined
+  notify: Restart network
+ 
+- template: src=ifcfg-sit.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  with_items: "{{ interfaces }}"
+  loop_control:
+    loop_var: "iface"
+  when: iface.type == 'SIT'
+  notify: Restart network
+
+- block:
+  - name: Ensure bonding interfaces are configured
+    template: src=ifcfg-bond.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+    with_items: "{{ interfaces }}"
+    loop_control:
+      loop_var: "iface"
+    when: iface.type == 'Bond'
+    notify: Restart network
+
+  - name: Ensure bonding module is enabled
+    copy: dest=/etc/modules-load.d/bonding.conf content="bonding" mode=0644 owner=root
+
+  when: use_bonding | default(false)

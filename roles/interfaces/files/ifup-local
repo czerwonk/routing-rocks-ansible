@@ -1,0 +1,5 @@
+#!/bin/bash
+
+script="/etc/sysconfig/network-scripts/postup-$1"
+
+test -x $script && source $script

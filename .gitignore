@@ -1,0 +1,5 @@
+*.retry
+inventory
+host_vars
+group_vars
+ansible.cfg

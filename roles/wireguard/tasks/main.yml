@@ -1,0 +1,42 @@
+---
+
+- name: Ensure repo is enabled
+  shell: dnf -y copr enable jdoss/wireguard
+
+- name: Ensure wireguard is installed
+  dnf: name={{ item }} state=installed
+  with_items:
+    - wireguard-dkms 
+    - wireguard-tools
+
+- name: Ensure config dir exists
+  file: path=/etc/wireguard state=directory owner=root
+  register: config_dir
+
+- name: Generate keys
+  shell: wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+  when: config_dir.changed
+
+- name: Ensure file permissions are set correctly
+  file: path=/etc/wireguard/privatekey mode=0400 state=file
+
+- name: Ensure script are present
+  template: src={{ item }}.j2 dest=/etc/wireguard/{{ item }}.sh owner=root mode=0750
+  with_items:
+    - start
+    - stop
+  notify: Restart wireguard
+
+- name: Ensure systemd unit exists
+  copy: src=wireguard.service dest=/lib/systemd/system/wireguard.service owner=root mode=0644
+  register: systemd_unit
+
+- name: Reload systemd
+  shell: systemctl daemon-reload
+  when: systemd_unit.changed
+
+- name: Ensure service is enabled
+  service: name=wireguard enabled=yes
+
+- name: Ensure service is started
+  service: name=wireguard state=started

@@ -1,0 +1,4 @@
+---
+
+- name: Restart bird_exporter
+  service: name=bird_exporter state=restarted
