@@ -6,3 +6,43 @@ template bgp generic_bgp {
   import keep filtered;
   next hop self;  
 };
+
+function tag_origin() {
+  bgp_large_community.add({{ communities.origin }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.origin }});
+{% endif %}
+}
+
+function tag_upstream() {
+  bgp_large_community.add({{ communities.upstream_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.upstream_import }});
+{% endif %}
+}
+
+function tag_downstream() {
+  bgp_large_community.add({{ communities.downstream_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.downstream_import }});
+{% endif %}
+}
+
+function tag_peering() {
+  bgp_large_community.add({{ communities.peer_import }});
+{% if communities_local is defined %}
+  bgp_large_community.add({{ communities_local.peer_import }});
+{% endif %}
+}
+
+function is_tagged_with_own_community() {
+  return bgp_large_community ~ [ ({{ asn }}, 0, *) ];
+}
+
+function is_downstream_route() {
+  return {{ communities.downstream_import }} ~ bgp_large_community;
+}
+
+function is_peer_route() {
+  return {{ communities.peer_import }} ~ bgp_large_community;
+}
