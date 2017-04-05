@@ -237,7 +237,7 @@ filter ospf_out {
   }
 {% endfor %}
 
-  if source = RTS_STATIC && is_default_route() then {
+  if source = RTS_STATIC && is_default_route() && DRAINED = 0 then {
     accept;
   }
 
