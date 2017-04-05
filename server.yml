@@ -1,7 +1,6 @@
 ---
 - hosts: servers
   roles:
-    - { role: packages }
-    - { role: users }
-    - { role: ssh }
-    - { role: dotfiles }
+    - packages
+    - users
+    - ssh
