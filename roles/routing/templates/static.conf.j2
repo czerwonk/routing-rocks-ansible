@@ -1,12 +1,12 @@
 protocol static {
-{% for route in static_routes.ipv6 | default([]) %}
+{% for route in tpl_routes %}
   route {{ route }};
 {% endfor %}
 }
 
 {% if static_prefix_routes | default(true) %}
 protocol static static_prefix {
-{% for prefix in prefixes.ipv6 | default([]) %}
+{% for prefix in tpl_prefixes %}
   route {{ prefix }} unreachable;
 {% endfor %}
 }

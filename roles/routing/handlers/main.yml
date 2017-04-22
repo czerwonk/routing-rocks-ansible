@@ -1,5 +1,8 @@
 ---
 
+- name: Reconfigure bird
+  shell: /usr/local/sbin/birdc configure
+
 - name: Reconfigure bird6
   shell: /usr/local/sbin/birdc6 configure
 

@@ -16,10 +16,21 @@ protocol kernel {
     accept;
   };
 };
+{% if routing.tables is defined %}
+{% for table in routing.tables | default([]) %}
+
+table {{ table.name }};
+protocol kernel kernel_{{ table.name }} {
+  table {{ table.name }};
+  kernel table {{ table.kernel_table }};
+  import all;
+  export all;
+};
+{% endfor %}
+{% endif %}
 
 protocol device {
   scan time 10;
 };
 
-include "{{ bird_config_dir }}/bgp.conf";
 include "{{ bird_config_dir }}/bird6.d/*.conf";

@@ -1,7 +1,10 @@
 ---
 
 - name: Ensure bird packages are uninstalled
-  dnf: name=bird6 state=absent
+  dnf: name={{ item }} state=absent
+  with_items:
+    - bird
+    - bird6
 
 - name: Check if source has changed
   get_url: url="ftp://bird.network.cz/pub/bird/bird-{{ bird_version }}.tar.gz" dest="/usr/src/bird-{{ bird_version }}.tar.gz"

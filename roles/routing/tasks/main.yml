@@ -1,5 +1,10 @@
 ---
 
-- include: 'install_bird.yml'
-- include: 'configure_bird.yml'
-- include: 'configure_service.yml'
+- include: install_bird.yml
+
+- include: configure_bird.yml
+
+- include: configure_service.yml service_name=bird6
+
+- include: configure_service.yml service_name=bird
+  when: bird_ipv4_enabled | default(false)

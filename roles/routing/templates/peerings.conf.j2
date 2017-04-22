@@ -1,6 +1,12 @@
-{% for peering in peerings.ipv6 | default([]) %}
+{% for peering in tpl_peerings %}
 {% for session in peering.sessions %}
 protocol bgp {{ session.name }} from generic_bgp {
+{% if peering.table is defined %}
+  table {{ peering.table }};
+{% endif %}
+{% if peering.local_as is defined %}
+  local as {{ peering.local_as }};
+{% endif %}
   neighbor {{ session.ip }} as {{ peering.asn }};
 {% if peering.source_ip is defined %}
   source address {{ peering.source_ip }};

@@ -1,13 +1,15 @@
 ---
 
 - name: Ensure systemd units exist
-  copy: src=bird6.service dest=/lib/systemd/system/bird6.service
+  copy: src={{ service_name }}.service dest=/lib/systemd/system/{{ service_name }}.service
+  register: service_unit
 
 - name: Reload systemd configuration
   shell: systemctl daemon-reload
+  when: service_unit.changed
 
 - name: Enable service
-  service: name=bird6 enabled=yes
+  service: name={{ service_name }} enabled=yes
 
 - name: Start if not started yet
-  service: name=bird6 state=started
+  service: name={{ service_name }} state=started
