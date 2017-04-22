@@ -34,7 +34,7 @@
     target: install
 
 - block:
-  - name: Configure bird6 build
+  - name: Configure bird build
     shell: cd /tmp/bird-{{ bird_version }} && ./configure --sysconfdir=/etc/bird
 
   - make:
