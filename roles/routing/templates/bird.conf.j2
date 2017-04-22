@@ -9,12 +9,7 @@ protocol direct {
 };
 
 protocol kernel {
-  export filter {
-{% if source_ipv6 is defined %}
-    krt_prefsrc = {{ source_ipv6 }};
-{% endif %}
-    accept;
-  };
+  export all;
 };
 {% if routing_tables is defined %}
 {% for table in routing_tables | default([]) %}
@@ -33,4 +28,4 @@ protocol device {
   scan time 10;
 };
 
-include "{{ bird_config_dir }}/bird6.d/*.conf";
+include "{{ bird_config_dir }}/bird.d/*.conf";
