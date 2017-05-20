@@ -23,12 +23,17 @@ COMMIT
 -A DROP_INPUT -j DROP
 
 -A INPUT -p icmp -j ACCEPT
+{% if firewall.filters is defined and firewall.filters.ipv4 is defined %}
+{% for filter in firewall.filters.ipv4.input | default([]) %}
+-A INPUT {{ filter }}
+{% endfor %}
+{% endif %}
+-A INPUT -p tcp -m tcp --dport 2222 -j ACCEPT
 {% for iface in interfaces %}
 {% if iface.type == 'Tunnel' and iface.tunnel.proto == 'GRE' %}
 -A INPUT -s {{ iface.tunnel.remote_ip }} -p {{ iface.tunnel.proto }} -j ACCEPT
 {% endif %}
 {% endfor %}
--A INPUT -p tcp -m tcp --dport 2222 -j ACCEPT
 {% for peer in peerings.ipv4 | default([]) %}
 {% for session in peer.sessions %}
 -A INPUT -s {{ session.ip }} -p tcp -m tcp --dport 179 -j ACCEPT
@@ -53,7 +58,16 @@ COMMIT
 -A DROP_FORWARD -m limit --limit 2/min -j LOG --log-prefix "iptables drop: CHAIN=FORWARD " --log-level 4
 -A DROP_FORWARD -j DROP
 
+-A FORWARD -p udp --dport 137 -j DROP_FORWARD
+-A FORWARD -p udp --dport 123 -j DROP_FORWARD
+-A FORWARD -p udp --dport 80 -j DROP_FORWARD
+-A FORWARD -p udp --dport 1900 -j DROP_FORWARD
 -A FORWARD -p icmp -j ACCEPT
+{% if firewall.filters is defined and firewall.filters.ipv4 is defined %}
+{% for filter in firewall.filters.ipv4.forward | default([]) %}
+-A FORWARD {{ filter }}
+{% endfor %}
+{% endif %}
 -A FORWARD -i lo -j ACCEPT
 {% for iface in firewall.interfaces.inside | default([]) %}
 -A FORWARD -i {{ iface }} -j ACCEPT
