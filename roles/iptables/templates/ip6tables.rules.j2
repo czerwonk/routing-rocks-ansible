@@ -39,7 +39,7 @@ COMMIT
 -A INPUT -p udp -m udp --dport 60001:60999 -j ACCEPT
 {% for host in prometheus_hosts | default([]) %}
 -A INPUT -s {{ host }} -p tcp -m tcp --dport 9100 -j ACCEPT
--A INPUT -s {{ host }} -p tcp -m tcp --dport 9200 -j ACCEPT
+-A INPUT -s {{ host }} -p tcp -m tcp --dport 9324 -j ACCEPT
 {% endfor %}
 -A INPUT -j DROP_INPUT
 
