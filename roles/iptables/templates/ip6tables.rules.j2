@@ -47,7 +47,6 @@ COMMIT
 -A DROP_FORWARD -j DROP
 
 -A FORWARD -p udp --dport 137 -j DROP_FORWARD
--A FORWARD -p udp --dport 123 -j DROP_FORWARD
 -A FORWARD -p udp --dport 80 -j DROP_FORWARD
 -A FORWARD -p udp --dport 1900 -j DROP_FORWARD
 {% if firewall.filters is defined and firewall.filters.ipv6 is defined %}
