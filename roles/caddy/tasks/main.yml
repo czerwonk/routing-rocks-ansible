@@ -8,7 +8,7 @@
     - upgrade
   notify: Restart caddy
 
-- name: Ensure caddy is allowd to open ports < 1024
+- name: Ensure caddy is allowed to open ports < 1024
   shell: setcap cap_net_bind_service=+ep /usr/local/bin/caddy
 
 - name: Ensure caddy directory exists
