@@ -1,0 +1,37 @@
+---
+
+- name: Ensure newest caddy version is installed
+  shell: {{ go_path }}/go get -u github.com/mholt/caddy/caddy
+  environment:
+    GOPATH: /usr/local
+  tags:
+    - upgrade
+  notify: Restart caddy
+
+- name: Ensure caddy is allowd to open ports < 1024
+  shell: setcap cap_net_bind_service=+ep /usr/local/bin/caddy
+
+- name: Ensure caddy directory exists
+  file: path=/etc/caddy owner=root mode=0755 state=directory 
+
+- name: Ensure caddy ssl directory exists
+  file: path=/etc/ssl/caddy owner=daemon mode=0755 state=directory 
+
+- name: Ensure config is up to date
+  template: src=Caddyfile.j2 dest=/etc/caddy/Caddyfile owner=root mode=0644
+  notify: Restart caddy
+
+- name: Ensure service unit exists
+  copy: src=caddy.service dest=/lib/systemd/system/caddy.service mode=0644 owner=root
+  register: systemd
+
+- block:
+  - name: Reload systemd
+    shell: systemctl daemon-reload
+
+  - name: Ensure service is enabled
+    service: name=caddy enabled=yes
+
+  - name: Ensure service is started
+    service: name=caddy state=started
+  when: systemd.changed

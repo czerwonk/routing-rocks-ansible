@@ -1,0 +1,10 @@
+[Unit]
+Description=caddywebserver
+
+[Service]
+User=daemon
+ExecStart=/usr/local/bin/caddy -conf /etc/caddy/Caddyfile -agree
+Environment=CADDYPATH=/etc/ssl/caddy
+
+[Install]
+WantedBy=default.target

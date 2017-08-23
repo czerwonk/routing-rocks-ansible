@@ -1,0 +1,15 @@
+{% for site in caddy.sites | default([]) %}
+{{ site.domain }} {
+{% if site.root is defined %}
+  root {{ site.root }}
+{% endif %}
+{% for p in site.proxy | default([]) %}
+  proxy {{ p.location | default('/') }} {{ p.backend }}
+{% endfor %}
+  gzip
+{% if site.auth is defined %}
+  basicauth {{ site.auth.location | default('/') }} {{ site.auth.user }} {{ site.auth.pass }}
+{% endif %}
+}
+
+{% endfor %}
