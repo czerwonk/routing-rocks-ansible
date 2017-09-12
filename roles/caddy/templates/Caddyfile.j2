@@ -4,7 +4,9 @@
   root {{ site.root }}
 {% endif %}
 {% for p in site.proxy | default([]) %}
-  proxy {{ p.location | default('/') }} {{ p.backend }}
+  proxy {{ p.location | default('/') }} {{ p.backend }} {
+    transparent
+  }
 {% endfor %}
   gzip
 {% if site.auth is defined %}
