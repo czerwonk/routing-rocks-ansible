@@ -1,4 +1,8 @@
 function is_bogon() {
+  if bgp_path ~ BOGON_ASNS then {
+    return true;
+  }
+
   return net ~ [
     ::/128,
     ::1/128,
