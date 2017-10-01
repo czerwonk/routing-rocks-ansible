@@ -9,7 +9,12 @@ protocol direct {
 };
 
 protocol kernel {
-  export all;
+  export filter {
+{% if source_ipv4 is defined %}
+    krt_prefsrc = {{ source_ipv4 }};
+{% endif %}
+    accept;
+  };
 };
 {% if routing_tables is defined %}
 {% for table in routing_tables | default([]) %}
