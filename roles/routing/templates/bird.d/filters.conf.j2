@@ -27,7 +27,7 @@ function is_default_route() {
 
 function is_own_prefix() {
 {% for p in prefixes.ipv4 | default([]) %}
-  if net = {{ p.prefix }} then return true;
+  if net = {{ p }} then return true;
 {% endfor %}
   return false;
 }
