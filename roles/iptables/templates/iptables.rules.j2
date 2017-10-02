@@ -1,6 +1,6 @@
 *nat
 {% for iface in firewall.interfaces.outside %}
--A POSTROUTING -o {{ iface }} -j MASQUERADE
+-A POSTROUTING -o {{ iface }} -j SNAT --to {{ firewall.nat_ip }} 
 {% endfor %}
 COMMIT
 
