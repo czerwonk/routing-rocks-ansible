@@ -5,6 +5,10 @@ NETWORK=127.0.0.0
 BROADCAST=127.255.255.255
 ONBOOT=yes
 NAME=loopback
+{% if loopback.ipv4 is defined %}
+IPADDR1={{ loopback.ipv4.address | ipaddr('address') }}
+PREFIX1={{ loopback.ipv4.address | ipaddr('prefix') }}
+{% endif %}
 {% if loopback.ipv6 is defined %}
 IPV6ADDR={{ loopback.ipv6.address }}
 {% endif %}
