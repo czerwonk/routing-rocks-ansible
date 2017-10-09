@@ -46,6 +46,9 @@ COMMIT
 -A INPUT -i {{ iface }} -j ACCEPT
 {% endfor %}
 -A INPUT -i wg+ -j ACCEPT
+{% for interface in ospf.interfaces | default([]) %}
+-A INPUT -i {{ interface | replace('*', '+') }} -p ospf -j ACCEPT
+{% endfor %}
 -A INPUT -p udp -m udp --dport 1194 -j ACCEPT
 -A INPUT -p udp -m udp --dport 60001:60999 -j ACCEPT
 {% for iface in wireguard.interfaces %}
