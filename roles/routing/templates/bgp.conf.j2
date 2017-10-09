@@ -7,6 +7,7 @@ define BOGON_ASNS = [ 0,                      # RFC 7607
                       65552..131071,          # IANA reserved ASNs https://www.mail-archive.com/uknof@lists.uknof.org.uk/msg03395.html
                       4200000000..4294967294, # RFC 6996 Private ASNs
                       4294967295 ];           # RFC 7300 Last 32 bit ASN
+define WHITELIST_ASNS = [ {{ asn_whitelist }} ];
 
 template bgp generic_bgp {
   local as {{ asn }};
@@ -55,4 +56,12 @@ function is_downstream_route() {
 
 function is_peer_route() {
   return {{ communities.peer_import }} ~ bgp_large_community;
+}
+
+function is_bogon_asn() {
+  if bgp_path.first ~ WHITELIST_ASNS then {
+    return false;
+  } 
+
+  return bgp_path ~ BOGON_ASNS;
 }

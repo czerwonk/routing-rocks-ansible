@@ -1,5 +1,5 @@
 function is_bogon() {
-  if bgp_path ~ BOGON_ASNS then {
+  if is_bogon_asn() then {
     return true;
   }
 
