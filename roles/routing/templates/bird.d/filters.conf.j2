@@ -117,21 +117,19 @@ filter upstream_in {
   accept;
 }
 
-{% for peer in peerings.ipv6 | default([]) %}
-{% if peers[peer.asn].accepted_prefixes is defined %}
+{% for peer in peerings.ipv4 | default([]) %}
+{% if peers[peer.asn].as_set is defined %}
 filter peer_as{{ peer.asn }}_in {
   if DRAINED = 1 then reject;
   if is_tagged_with_own_community() then reject;
 
-{% for p in peers[peer.asn].accepted_prefixes.ipv4 | default([]) %}
-  if net ~ [ {{ p }} ] then {
+  if net ~ {{ peers[peer.asn].as_set }} then {
     tag_peering();
 {% if peers[peer.asn].downstream | default(false) %}
     tag_downstream();
 {% endif %}
     accept;
   }
-{% endfor %}
 
   reject;
 }

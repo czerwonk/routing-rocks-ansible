@@ -33,4 +33,5 @@ protocol device {
   scan time 10;
 };
 
+include "{{ bird_config_dir }}/bird.d/as-sets/*.conf";
 include "{{ bird_config_dir }}/bird.d/*.conf";
