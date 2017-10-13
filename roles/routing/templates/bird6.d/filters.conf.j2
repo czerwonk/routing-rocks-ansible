@@ -76,7 +76,9 @@ function should_announce_ebgp() {
 }
 
 function default_ebgp_out() {
-  if DRAINED = 1 then reject;
+  if DRAINED = 1 then {
+    return false;
+  }
 
   if should_announce_ebgp() then {
 {% for i in range(path_prepend | default(0)) %}
