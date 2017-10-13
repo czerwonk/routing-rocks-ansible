@@ -91,6 +91,7 @@ function default_ebgp_out() {
 }
 
 {% for peer in peerings.ipv6 | default([]) %}
+{% if peer.asn != asn %}
 filter ebgp_as{{ peer.asn }}_out {
 {% if peers[peer.asn].rtbh_community is defined %}
 {% endif %}
@@ -107,6 +108,7 @@ filter ebgp_as{{ peer.asn }}_out {
   reject;
 }
 
+{% endif %}
 {% endfor %}
 
 filter upstream_in {

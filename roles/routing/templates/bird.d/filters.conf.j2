@@ -101,6 +101,7 @@ function default_ebgp_out() {
 }
 
 {% for peer in peerings.ipv4 | default([]) %}
+{% if peer.asn != asn %}
 filter ebgp_as{{ peer.asn }}_out {
 {% if peers[peer.asn].rtbh_community is defined %}
   if is_rtbh() then {
@@ -122,6 +123,7 @@ filter ebgp_as{{ peer.asn }}_out {
   reject;
 }
 
+{% endif %}
 {% endfor %}
 filter upstream_in {
   if DRAINED = 1 then reject;
