@@ -75,32 +75,37 @@ function should_announce_ebgp() {
   return false;
 }
 
-filter ebgp_out {
+function default_ebgp_out() {
   if DRAINED = 1 then reject;
 
-  if (should_announce_ebgp()) then {
+  if should_announce_ebgp() then {
 {% for i in range(path_prepend | default(0)) %}
     bgp_path.prepend({{ asn }});
 {% endfor %}
-    accept;
+    return true;
   }
 
-  reject;
+  return false;
 }
 
-filter ebgp_out_failsafe {
-  if DRAINED = 1 then reject;
-
-  if (should_announce_ebgp()) then {
-{% for i in range(path_prepend | default(0) + 3) %}
+{% for peer in peerings.ipv6 | default([]) %}
+filter ebgp_as{{ peer.asn }}_out {
+{% if peers[peer.asn].rtbh_community is defined %}
+{% endif %}
+  if default_ebgp_out() then {
+{% for i in range(peers[peer.asn].as_prepend | default(peer.as_prepend) | default(0)) %}
     bgp_path.prepend({{ asn }});
 {% endfor %}
-
+{% for c in peer.communities | default(peers[peer.asn].communities) | default([]) %}
+    bgp_community.add({{ c }});
+{% endfor %} 
     accept;
   }
-  
+
   reject;
 }
+
+{% endfor %}
 
 filter upstream_in {
   if DRAINED = 1 then reject;
