@@ -102,6 +102,9 @@ filter ebgp_as{{ peer.asn }}_out {
 {% for c in peer.communities | default(peers[peer.asn].communities) | default([]) %}
     bgp_community.add({{ c }});
 {% endfor %} 
+{% for c in peer.large_communities | default(peers[peer.asn].large_communities) | default([]) %}
+    bgp_large_community.add({{ c }});
+{% endfor %} 
     accept;
   }
 
