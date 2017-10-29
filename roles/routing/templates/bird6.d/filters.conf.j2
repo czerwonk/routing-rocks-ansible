@@ -128,6 +128,8 @@ filter upstream_as{{ peer.asn }}_in {
 {% if r.ip_version is not defined or r.ip_version == 6 %}
 {% if r.when.source_as is defined %}
   if bgp_path.last = {{ r.when.source_as }} then {
+{% elif r.when.prefix is defined %}
+  if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
   if bgp_community ~ {{ r.when.community }} then {
 {% elif r.when.large_community is defined %}
@@ -165,6 +167,8 @@ filter peer_as{{ peer.asn }}_in {
 
 {% if r.when.source_as is defined %}
     if bgp_path.last = {{ r.when.source_as }} then {
+{% elif r.when.prefix is defined %}
+    if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
     if bgp_community ~ {{ r.when.community }} then {
 {% elif r.when.large_community is defined %}
