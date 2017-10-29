@@ -114,18 +114,41 @@ filter ebgp_as{{ peer.asn }}_out {
 {% endif %}
 {% endfor %}
 
-filter upstream_in {
+{% for peer in peerings.ipv6 %}
+{% if peers[peer.asn].upstream | default(false) %}
+filter upstream_as{{ peer.asn }}_in {
   if DRAINED = 1 then reject;
-  if is_default_route() then reject;
   if is_bogon() then reject;
   if is_own_prefix() then reject;
   if is_tagged_with_own_community() then reject;
 
   tag_upstream();
 
+{% for r in peers[peer.asn].rules | default([]) %}
+{% if r.ip_version is not defined or r.ip_version == 6 %}
+{% if r.when.source_as is defined %}
+  if bgp_path.last = {{ r.when.source_as }} then {
+{% elif r.when.community is defined %}
+  if bgp_community ~ {{ r.when.community }} then {
+{% elif r.when.large_community is defined %}
+  if bgp_large_community ~ {{ r.when.large_community }} then {
+{% endif %}
+{% if r.then.set_local_pref is defined %}
+    bgp_local_pref = {{ r.then.set_local_pref }};
+{% elif r.then.add_community is defined %}
+    bgp_community.add({{ r.then.add_community }});
+{% elif r.then.add_large_community is defined %}
+    bgp_large_community.add({{ r.then.add_large_community }});
+{% endif %}
+  }
+
+{% endif %}
+{% endfor %}
   accept;
 }
 
+{% endif %}
+{% endfor %}
 {% for peer in peerings.ipv6 | default([]) %}
 {% if peers[peer.asn].as_set is defined %}
 filter peer_as{{ peer.asn }}_in {
@@ -137,6 +160,26 @@ filter peer_as{{ peer.asn }}_in {
 {% if peers[peer.asn].downstream | default(false) %}
     tag_downstream();
 {% endif %}
+{% for r in peers[peer.asn].rules | default([]) %}
+{% if r.ip_version is not defined or r.ip_version == 6 %}
+
+{% if r.when.source_as is defined %}
+    if bgp_path.last = {{ r.when.source_as }} then {
+{% elif r.when.community is defined %}
+    if bgp_community ~ {{ r.when.community }} then {
+{% elif r.when.large_community is defined %}
+    if bgp_large_community ~ {{ r.when.large_community }} then {
+{% endif %}
+{% if r.then.set_local_pref is defined %}
+      bgp_local_pref = {{ r.then.set_local_pref }};
+{% elif r.then.add_community is defined %}
+      bgp_community.add({{ r.then.add_community }});
+{% elif r.then.add_large_community is defined %}
+      bgp_large_community.add({{ r.then.add_large_community }});
+{% endif %}
+    }
+{% endif %}
+{% endfor %}
     accept;
   }
 
