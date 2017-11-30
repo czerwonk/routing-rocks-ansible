@@ -23,7 +23,7 @@ COMMIT
 -A INPUT -p tcp -m tcp --dport 2222 -j ACCEPT
 {% for peer in peerings.ipv6 | default([]) %}
 {% for session in peer.sessions %}
--A INPUT -s {{ session.ip }} -p tcp -m tcp --dport 179 -j ACCEPT
+-A INPUT -s {{ session.ip }}{% if session.interface is defined %} -i {{ session.interface }}{% endif %} -p tcp -m tcp --dport 179 -j ACCEPT
 {% endfor %}
 {% endfor %}
 -A INPUT -i lo -j ACCEPT

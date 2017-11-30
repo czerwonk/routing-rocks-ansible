@@ -36,7 +36,7 @@ COMMIT
 {% endfor %}
 {% for peer in peerings.ipv4 | default([]) %}
 {% for session in peer.sessions %}
--A INPUT -s {{ session.ip }} -p tcp -m tcp --dport 179 -j ACCEPT
+-A INPUT -s {{ session.ip }}{% if session.interface is defined %} -i {{ session.interface }}{% endif %} -p tcp -m tcp --dport 179 -j ACCEPT
 {% endfor %}
 {% endfor %}
 -A INPUT -m conntrack --ctstate INVALID -j DROP_INPUT
