@@ -3,7 +3,7 @@ Description=Bird Exporter
 
 [Service]
 User=root
-ExecStart=/usr/local/bin/bird_exporter -bird.ipv4=false -bird.socket6=/usr/local/var/run/bird6.ctl
+ExecStart=/usr/local/bin/bird_exporter -bird.ipv4=false -bird.socket6=/usr/local/var/run/bird6.ctl -format.new=true
 
 [Install]
 WantedBy=default.target
