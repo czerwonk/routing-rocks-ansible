@@ -10,7 +10,7 @@
   get_url: url="ftp://bird.network.cz/pub/bird/bird-{{ bird_version }}.tar.gz" dest="/usr/src/bird-{{ bird_version }}.tar.gz"
   register: bird_source
 
-- include: 'build_bird.yml'
+- include_tasks: 'build_bird.yml'
   when: bird_source.changed
   
 - name: Ensure rsyslog config exists

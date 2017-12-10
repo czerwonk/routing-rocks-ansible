@@ -1,5 +1,5 @@
 ---
 
-- include: 'configure_jool.yml'
-- include: 'configure_bind.yml'
+- import_tasks: 'configure_jool.yml'
+- include_tasks: 'configure_bind.yml'
   when: dns64_enabled | default(false)

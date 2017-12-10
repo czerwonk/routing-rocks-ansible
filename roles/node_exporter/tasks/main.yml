@@ -9,8 +9,8 @@
 - stat: path=/bin/systemctl
   register: systemd
 
-- include: configure_initd.yml
+- include_tasks: configure_initd.yml
   when: not systemd.stat.exists
 
-- include: configure_systemd.yml
+- include_tasks: configure_systemd.yml
   when: systemd.stat.exists    
