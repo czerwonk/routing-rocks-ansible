@@ -50,18 +50,6 @@ filter full_view {
   reject;
 }
 
-filter ibgp_in {
-  if DRAINED = 1 then reject;
-  if net ~ [ {{ ibgp_prefix_filter }} ] then accept;
-  reject;
-}
-
-filter ibgp_out {
-  if DRAINED = 1 then reject;
-  if is_default_route() then accept;
-  reject;
-}
-
 function should_announce_ebgp() {
   if is_own_prefix() then {
     tag_origin();
@@ -282,3 +270,16 @@ filter ospf_in {
 
   reject;
 }
+{% for filter in filters.ipv6 | default([]) %}
+
+filter {{ filter.name }} {
+  if DRAINED = 1 then reject;
+{% for p in filter.prefixes | default([]) %}
+  if net ~ [ {{ p }} ] then accept;
+{% endfor %}
+{% if filter.accept_default | default(false) %}
+  if is_default_route() then accept;
+{% endif %}
+  reject;
+}
+{% endfor %}
