@@ -92,6 +92,10 @@ function default_ebgp_out() {
     return false;
   }
 
+  if !defined(bgp_path) then {
+    bgp_path.empty;
+  }
+
   if should_announce_ebgp() then {
 {% for i in range(path_prepend | default(0)) %}
     bgp_path.prepend({{ asn }});
