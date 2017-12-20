@@ -4,16 +4,6 @@
   file: name={{ bird_config_dir }}/ owner=root mode=0755 state=directory
 
 - name: Ensure config subdir exists
-  file: name={{ bird_config_dir }}/bird6.d owner=root mode=0755 state=directory
-
-- name: Ensure as-sets dir exists
-  file: name={{ bird_config_dir }}/bird6.d/as-sets owner=root mode=0755 state=directory
-
-- name: Configure generic bgp
-  template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird6.d/bgp.conf owner=root mode=0644
-  notify: Reconfigure bird6
-
-- name: Ensure config subdir exists
   file: name={{ bird_config_dir }}/bird.d owner=root mode=0755 state=directory
 
 - name: Ensure as-sets dir exists
@@ -23,21 +13,27 @@
   template: src=bird.conf.j2 dest={{ bird_config_dir }}/bird.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird.d/bgp.conf owner=root mode=0644
+- name: Configure generic bgp
+  template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird.d/bgp.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=filters.conf.j2 dest={{ bird_config_dir }}/bird.d/filters.conf owner=root mode=0644
+- name: Configure filters
+  template: src=filters.conf.j2 dest={{ bird_config_dir }}/bird.d/filters.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=static.conf.j2 dest={{ bird_config_dir }}/bird.d/static.conf owner=root mode=0644
+- name: Configure static
+  template: src=static.conf.j2 dest={{ bird_config_dir }}/bird.d/static.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=peerings.conf.j2 dest={{ bird_config_dir }}/bird.d/peerings.conf owner=root mode=0644
+- name: Configure peerings
+  template: src=peerings.conf.j2 dest={{ bird_config_dir }}/bird.d/peerings.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=ospf.conf.j2 dest={{ bird_config_dir }}/bird.d/ospf.conf owner=root mode=0644
+- name: Configure OSPF
+  template: src=ospf.conf.j2 dest={{ bird_config_dir }}/bird.d/ospf.conf owner=root mode=0644
   notify: Reconfigure bird
 
-- template: src=radv.conf.j2 dest={{ bird_config_dir }}/bird.d/radv.conf owner=root mode=0644
+- name: Configure RAdv
+  template: src=radv.conf.j2 dest={{ bird_config_dir }}/bird.d/radv.conf owner=root mode=0644
   when: radv is defined
   notify: Reconfigure bird
