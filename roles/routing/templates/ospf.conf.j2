@@ -26,7 +26,7 @@ protocol ospf v3 ospf6 {
   };
 }
 
-protocol ospf v2 ospf4 {
+protocol ospf v3 ospf4 {
 {% if ecmp | default(false) %}
   ecmp on;
 {% endif %}
@@ -42,10 +42,6 @@ protocol ospf v2 ospf4 {
       dead 20;
 {% if interface | match('^gre.*') %}
       ttl security on;
-{% endif %}
-{% if ospf.password is defined %}
-      authentication cryptographic;
-      password "{{ ospf.password }}";
 {% endif %}
     };
 {% endfor %}
