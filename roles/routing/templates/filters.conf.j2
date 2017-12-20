@@ -17,16 +17,30 @@ function is_bogon() {
     198.51.100.0/24{24,32},
     203.0.113.0/24{24,32},
     240.0.0.0/4{4,32},
-    255.255.255.255/32
+    255.255.255.255/32,
+    ::/128,
+    ::1/128,
+    fc00::/7{7,128},
+    fe80::/10{10,128},
+    2001::/32{32,128},
+    2001:0002::/48{48,128},
+    2001:0010::/28{28,128},
+    2002::/16{16,128},
+    2001:db8::/32{32,128},
+    ff00::/8{8,128},
+    3ffe::/16{16,128}
   ];
 }
 
 function is_default_route() {
-  return net = 0.0.0.0/0;
+  return net = 0.0.0.0/0 || net = ::/0;
 }
 
 function is_own_prefix() {
 {% for p in prefixes.ipv4 | default([]) %}
+  if net = {{ p }} then return true;
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
   if net = {{ p }} then return true;
 {% endfor %}
   return false;
@@ -44,16 +58,16 @@ filter drain {
 }
 
 filter accept_all {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
   accept;
 }
 
 filter full_view {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
   if is_bogon() then reject;
   if is_default_route() then reject;
   
-  if net ~ [ 0.0.0.0/0{0,24} ] then {
+  if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
     accept;
   }
 
@@ -74,7 +88,7 @@ function should_announce_ebgp() {
 }
 
 function default_ebgp_out() {
-  if DRAINED = 1 then {
+  if DRAINED then {
     return false;
   }
 
@@ -88,7 +102,7 @@ function default_ebgp_out() {
   return false;
 }
 
-{% for peer in peerings.ipv4 | default([]) %}
+{% for peer in peerings | default([]) %}
 {% if peer.asn != asn %}
 filter ebgp_as{{ peer.asn }}_out {
 {% if peers[peer.asn].rtbh_community is defined %}
@@ -116,10 +130,10 @@ filter ebgp_as{{ peer.asn }}_out {
 
 {% endif %}
 {% endfor %}
-{% for peer in peerings.ipv4 | default([]) %}
+{% for peer in peerings | default([]) %}
 {% if peers[peer.asn].upstream | default(false) %}
 filter upstream_as{{ peer.asn }}_in {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
   if is_bogon() then reject;
   if is_own_prefix() then reject;
   if is_tagged_with_own_community() then reject;
@@ -127,9 +141,8 @@ filter upstream_as{{ peer.asn }}_in {
   tag_upstream();
 
 {% for r in peers[peer.asn].rules | default([]) %}
-{% if r.ip_version is not defined or r.ip_version == 4 %}
 {% if r.when.source_as is defined %}
-  if bgp_path.last = {{ r.when.source_as }} then {
+  if bgp_path.last = {{ r.when.source_as }}{% if r.ip_version is defined %} && net.type = NET_IP{{ r.ip_version }}{% endif %} then {
 {% elif r.when.prefix is defined %}
   if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
@@ -146,31 +159,29 @@ filter upstream_as{{ peer.asn }}_in {
 {% endif %}
   }
 
-{% endif %}
 {% endfor %}
   accept;
 }
 
 {% endif %}
 {% endfor %}
-{% for peer in peerings.ipv4 | default([]) %}
+{% for peer in peerings | default([]) %}
 {% if peers[peer.asn].as_set is defined %}
 filter peer_as{{ peer.asn }}_in {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
   if is_bogon() then reject;
   if is_own_prefix() then reject;
   if is_tagged_with_own_community() then reject;
 
-  if net ~ {{ peers[peer.asn].as_set }} then {
+  if net ~ {{ peers[peer.asn].as_set }}_IPv4 || net ~ {{ peers[peer.asn].as_set }}_IPv6 then {
     tag_peering();
 {% if peers[peer.asn].downstream | default(false) %}
     tag_downstream();
 {% endif %}
 {% for r in peers[peer.asn].rules | default([]) %}
-{% if r.ip_version is not defined or r.ip_version == 4 %}
 
 {% if r.when.source_as is defined %}
-    if bgp_path.last = {{ r.when.source_as }} then {
+    if bgp_path.last = {{ r.when.source_as }}{% if r.ip_version is defined %} && net.type = NET_IP{{ r.ip_version }}{% endif %} then {
 {% elif r.when.prefix is defined %}
     if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
@@ -186,7 +197,6 @@ filter peer_as{{ peer.asn }}_in {
       bgp_large_community.add({{ r.then.add_large_community }});
 {% endif %}
     }
-{% endif %}
 {% endfor %}
     accept;
   }
@@ -197,10 +207,15 @@ filter peer_as{{ peer.asn }}_in {
 {% endif %}
 {% endfor %}
 filter bb_ibgp_in {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
 
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if net ~ [ {{ prefix }}{8,24} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if net ~ [ {{ p }}{8,24} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
+  if net ~ [ {{ p }}{52,64} ] then {
     accept;
   }
 {% endfor %}
@@ -209,10 +224,15 @@ filter bb_ibgp_in {
 }
 
 filter site_ibgp_out {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
 
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ prefix }}{24,24} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{24,24} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{64,64} ] then {
     accept;
   }
 {% endfor %}
@@ -221,10 +241,15 @@ filter site_ibgp_out {
 }
 
 filter bb_ibgp_out {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
 
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if source = RTS_STATIC && net ~ [ {{ prefix }}{8,24} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if source = RTS_STATIC && net ~ [ {{ p }}{8,24} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
+  if source = RTS_STATIC && net ~ [ {{ p }}{52,64} ] then {
     accept;
   }
 {% endfor %}
@@ -235,12 +260,17 @@ filter bb_ibgp_out {
 filter bb_ibgp_full_out {
   if is_default_route() then reject;
   
-  if net ~ [ 0.0.0.0/0{0,24} ] then {
+  if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
     accept;
   }
 
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ prefix }}{8,24} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{8,24} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv4 | default([]) %}
+  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{52,64} ] then {
     accept;
   }
 {% endfor %}
@@ -264,13 +294,18 @@ filter bb_ibgp_local_router_in {
 }
 
 filter ospf_out {
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if source = RTS_DEVICE && net ~ [ {{ prefix }}{32,32} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if source = RTS_DEVICE && net ~ [ {{ p }}{32,32} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
+  if source = RTS_DEVICE && net ~ [ {{ p }}{128,128} ] then {
     accept;
   }
 {% endfor %}
 
-  if source = RTS_STATIC && is_default_route() && DRAINED = 0 then {
+  if source = RTS_STATIC && is_default_route() && !DRAINED then {
     accept;
   }
 
@@ -278,18 +313,23 @@ filter ospf_out {
 }
 
 filter ospf_in {
-{% for prefix in prefixes.ipv4 | default([]) %}
-  if net ~ [ 0.0.0.0/0{32,32} ] then {
+{% for p in prefixes.ipv4 | default([]) %}
+  if net ~ [ {{ p }}{32,32} ] then {
+    accept;
+  }
+{% endfor %}
+{% for p in prefixes.ipv6 | default([]) %}
+  if net ~ [ {{ p }}{128,128} ] then {
     accept;
   }
 {% endfor %}
 
   reject;
 }
-{% for filter in filters.ipv4 | default([]) %}
+{% for filter in filters | default([]) %}
 
 filter {{ filter.name }} {
-  if DRAINED = 1 then reject;
+  if DRAINED then reject;
 {% for p in filter.prefixes | default([]) %}
   if net ~ [ {{ p }} ] then accept;
 {% endfor %}

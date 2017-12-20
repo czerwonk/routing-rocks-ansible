@@ -1,4 +1,4 @@
-{% for peering in tpl_peerings %}
+{% for peering in peerings %}
 {% for session in peering.sessions %}
 protocol bgp {{ session.name }} from generic_bgp {
 {% if peering.table is defined %}
@@ -8,19 +8,25 @@ protocol bgp {{ session.name }} from generic_bgp {
   local as {{ peering.local_as }};
 {% endif %}
   neighbor {{ session.ip }} as {{ peering.asn }};
-{% if peering.source_ip is defined %}
+{% if session.source_ip is defined %}
+  source address {{ session.source_ip }};
+{% elif peering.source_ip is defined %}
   source address {{ peering.source_ip }};
 {% endif %}
+  {% if session.ip | ipv6() == False %}ipv4{% else %}ipv6{% endif %}{
+     next hop self;
+     import keep filtered;
 {% if session.filters is defined %}
-  import filter {{ session.filters.import | default('drain') }};
-  export filter {{ session.filters.export | default('drain') }};
+     import filter {{ session.filters.import | default('drain') }};
+     export filter {{ session.filters.export | default('drain') }};
 {% elif peering.filters is defined %}
-  import filter {{ peering.filters.import | default('drain') }};
-  export filter {{ peering.filters.export | default('drain') }};
+     import filter {{ peering.filters.import | default('drain') }};
+     export filter {{ peering.filters.export | default('drain') }};
 {% else %}
-  import filter {{ peers[peering.asn].filters.import | default('drain') }};
-  export filter {{ peers[peering.asn].filters.export | default('drain') }};
+     import filter {{ peers[peering.asn].filters.import | default('drain') }};
+     export filter {{ peers[peering.asn].filters.export | default('drain') }};
 {% endif %}
+  };
 {% if peering.local_pref is defined %}
   default bgp_local_pref {{ peering.local_pref }};
 {% endif %}

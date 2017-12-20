@@ -4,7 +4,4 @@
 
 - import_tasks: configure_bird.yml
 
-- import_tasks: configure_service.yml service_name=bird6
-
-- include_tasks: configure_service.yml service_name=bird
-  when: bird_ipv4_enabled | default(false)
+- import_tasks: configure_service.yml service_name=bird

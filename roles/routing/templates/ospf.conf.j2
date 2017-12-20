@@ -1,6 +1,11 @@
-protocol ospf {
-  import filter ospf_in;
-  export filter ospf_out;
+protocol ospf v3 ospf6 {
+{% if ecmp | default(false) %}
+  ecmp on;
+{% endif %}
+  ipv6 {
+    import filter ospf_in;
+    export filter ospf_out;
+  };
 
   area 0 {
 {% for interface in ospf.interfaces | default([]) %}
@@ -9,6 +14,38 @@ protocol ospf {
       dead 20;
 {% if interface | match('^gre.*') %}
       ttl security on;
+{% endif %}
+    };
+{% endfor %}
+
+{% for interface in ospf.stub_interfaces | default([]) %}
+    interface "{{ interface }}" {
+      stub;
+    };
+{% endfor %}
+  };
+}
+
+protocol ospf v2 ospf4 {
+{% if ecmp | default(false) %}
+  ecmp on;
+{% endif %}
+  ipv4 {
+    import filter ospf_in;
+    export filter ospf_out;
+  };
+
+  area 0 {
+{% for interface in ospf.interfaces | default([]) %}
+    interface "{{ interface }}" {
+      hello 5; 
+      dead 20;
+{% if interface | match('^gre.*') %}
+      ttl security on;
+{% endif %}
+{% if ospf.password is defined %}
+      authentication cryptographic;
+      password "{{ ospf.password }}";
 {% endif %}
     };
 {% endfor %}
