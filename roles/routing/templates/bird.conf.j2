@@ -2,7 +2,11 @@ define DRAINED = false;
 
 log syslog all;
 router id {{ router_id }};
-timeformat protocol "%s";
+
+timeformat base     iso long;
+timeformat log      iso long;
+timeformat protocol iso long;
+timeformat route    iso long;
 
 protocol direct direct4 {
   ipv4;
