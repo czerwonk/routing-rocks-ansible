@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure systemd units exist
-  copy: src={{ service_name }}.service dest=/lib/systemd/system/{{ service_name }}.service
+  copy: src=bird.service dest=/lib/systemd/system/bird.service
   register: service_unit
 
 - name: Reload systemd configuration
@@ -9,7 +9,7 @@
   when: service_unit.changed
 
 - name: Enable service
-  service: name={{ service_name }} enabled=yes
+  service: name=bird enabled=yes
 
 - name: Start if not started yet
-  service: name={{ service_name }} state=started
+  service: name=bird state=started

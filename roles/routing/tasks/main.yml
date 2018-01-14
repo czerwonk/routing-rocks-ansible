@@ -4,4 +4,4 @@
 
 - import_tasks: configure_bird.yml
 
-- import_tasks: configure_service.yml service_name=bird
+- import_tasks: configure_service.yml
