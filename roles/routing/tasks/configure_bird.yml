@@ -4,67 +4,36 @@
   file: name={{ bird_config_dir }}/ owner=root mode=0755 state=directory
 
 - name: Ensure config subdir exists
-  file: name={{ bird_config_dir }}/bird6.d owner=root mode=0755 state=directory
+  file: name={{ bird_config_dir }}/bird.d owner=root mode=0755 state=directory
 
 - name: Ensure as-sets dir exists
-  file: name={{ bird_config_dir }}/bird6.d/as-sets owner=root mode=0755 state=directory
-
-- name: Configure generic bgp
-  template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird6.d/bgp.conf owner=root mode=0644
-  notify: Reconfigure bird6
+  file: name={{ bird_config_dir }}/bird.d/as-sets owner=root mode=0755 state=directory
 
 - name: Configure bird
-  template: src=bird6.conf.j2 dest={{ bird_config_dir }}/bird6.conf owner=root mode=0644
+  template: src=bird.conf.j2 dest={{ bird_config_dir }}/bird.conf owner=root mode=0644
+  notify: Reconfigure bird
 
-- template: src=bird6.d/filters.conf.j2 dest={{ bird_config_dir }}/bird6.d/filters.conf owner=root mode=0644
-  notify: Reconfigure bird6
+- name: Configure generic bgp
+  template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird.d/bgp.conf owner=root mode=0644
+  notify: Reconfigure bird
 
-- template: src=static.conf.j2 dest={{ bird_config_dir }}/bird6.d/static.conf owner=root mode=0644
-  vars:
-    tpl_prefixes: "{{ prefixes.ipv6 | default([]) }}"
-    tpl_routes: "{{ static_routes.ipv6 | default([]) }}"
-  notify: Reconfigure bird6
+- name: Configure filters
+  template: src=filters.conf.j2 dest={{ bird_config_dir }}/bird.d/filters.conf owner=root mode=0644
+  notify: Reconfigure bird
 
-- template: src=peerings.conf.j2 dest={{ bird_config_dir }}/bird6.d/peerings.conf owner=root mode=0644
-  vars:
-    tpl_peerings: "{{ peerings.ipv6 | default([]) }}"
-  notify: Reconfigure bird6
+- name: Configure static
+  template: src=static.conf.j2 dest={{ bird_config_dir }}/bird.d/static.conf owner=root mode=0644
+  notify: Reconfigure bird
 
-- template: src=ospf.conf.j2 dest={{ bird_config_dir }}/bird6.d/ospf.conf owner=root mode=0644
-  notify: Reconfigure bird6
+- name: Configure peerings
+  template: src=peerings.conf.j2 dest={{ bird_config_dir }}/bird.d/peerings.conf owner=root mode=0644
+  notify: Reconfigure bird
 
-- template: src=bird6.d/radv.conf.j2 dest={{ bird_config_dir }}/bird6.d/radv.conf owner=root mode=0644
+- name: Configure OSPF
+  template: src=ospf.conf.j2 dest={{ bird_config_dir }}/bird.d/ospf.conf owner=root mode=0644
+  notify: Reconfigure bird
+
+- name: Configure RAdv
+  template: src=radv.conf.j2 dest={{ bird_config_dir }}/bird.d/radv.conf owner=root mode=0644
   when: radv is defined
-  notify: Reconfigure bird6
-
-- block:
-  - name: Ensure config subdir exists
-    file: name={{ bird_config_dir }}/bird.d owner=root mode=0755 state=directory
-
-  - name: Ensure as-sets dir exists
-    file: name={{ bird_config_dir }}/bird.d/as-sets owner=root mode=0755 state=directory
-
-  - name: Configure bird
-    template: src=bird.conf.j2 dest={{ bird_config_dir }}/bird.conf owner=root mode=0644
-
-  - template: src=bgp.conf.j2 dest={{ bird_config_dir }}/bird.d/bgp.conf owner=root mode=0644
-    notify: Reconfigure bird
-
-  - template: src=bird.d/filters.conf.j2 dest={{ bird_config_dir }}/bird.d/filters.conf owner=root mode=0644
-    notify: Reconfigure bird
-
-  - template: src=static.conf.j2 dest={{ bird_config_dir }}/bird.d/static.conf owner=root mode=0644
-    vars:
-      tpl_prefixes: "{{ prefixes.ipv4 | default([]) }}"
-      tpl_routes: "{{ static_routes.ipv4 | default([]) }}"
-    notify: Reconfigure bird
-
-  - template: src=peerings.conf.j2 dest={{ bird_config_dir }}/bird.d/peerings.conf owner=root mode=0644
-    vars:
-      tpl_peerings: "{{ peerings.ipv4 | default([]) }}"
-    notify: Reconfigure bird
-
-  - template: src=ospf.conf.j2 dest={{ bird_config_dir }}/bird.d/ospf.conf owner=root mode=0644
-    notify: Reconfigure bird
-
-  when: bird_ipv4_enabled | default(false)
+  notify: Reconfigure bird

@@ -17,37 +17,18 @@
     dest: /tmp
     remote_src: true
 
-- name: Configure bird6 build
-  shell: cd /tmp/bird-{{ bird_version }} && ./configure --enable-ipv6 --sysconfdir=/etc/bird
+- name: Configure bird build
+  shell: cd /tmp/bird-{{ bird_version }} && ./configure --sysconfdir=/etc/bird
 
 - make:
     chdir: "/tmp/bird-{{ bird_version }}"
     target: clean
 
-- name: Build bird6
+- name: Build bird
   make:
     chdir: "/tmp/bird-{{ bird_version }}"
 
-- name: Install bird6
+- name: Install bird
   make:
     chdir: "/tmp/bird-{{ bird_version }}"
     target: install
-
-- block:
-  - name: Configure bird build
-    shell: cd /tmp/bird-{{ bird_version }} && ./configure --sysconfdir=/etc/bird
-
-  - make:
-      chdir: "/tmp/bird-{{ bird_version }}"
-      target: clean
-
-  - name: Build bird
-    make:
-      chdir: "/tmp/bird-{{ bird_version }}"
-
-  - name: Install bird
-    make:
-      chdir: "/tmp/bird-{{ bird_version }}"
-      target: install
-
-  when: bird_ipv4_enabled | default(false)

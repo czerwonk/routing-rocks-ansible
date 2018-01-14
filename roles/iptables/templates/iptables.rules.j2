@@ -34,9 +34,11 @@ COMMIT
 -A INPUT -s {{ iface.tunnel.remote_ip }} -p {{ iface.tunnel.proto }} -j ACCEPT
 {% endif %}
 {% endfor %}
-{% for peer in peerings.ipv4 | default([]) %}
+{% for peer in peerings | default([]) %}
 {% for session in peer.sessions %}
+{% if session.ip | ipv4() != False %}
 -A INPUT -s {{ session.ip }}{% if session.interface is defined %} -i {{ session.interface }}{% endif %} -p tcp -m tcp --dport 179 -j ACCEPT
+{% endif %}
 {% endfor %}
 {% endfor %}
 -A INPUT -m conntrack --ctstate INVALID -j DROP_INPUT
