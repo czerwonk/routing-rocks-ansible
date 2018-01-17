@@ -1,6 +1,6 @@
 ---
 
-#- import_tasks: install_bird.yml
+- import_tasks: install_bird.yml
 
 - import_tasks: configure_bird.yml
 
