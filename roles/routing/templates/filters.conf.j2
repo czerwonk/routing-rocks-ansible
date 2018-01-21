@@ -273,7 +273,7 @@ filter bb_ibgp_full_out {
     accept;
   }
 {% endfor %}
-{% for p in prefixes.ipv4 | default([]) %}
+{% for p in prefixes.ipv6 | default([]) %}
   if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{52,64} ] then {
     accept;
   }
