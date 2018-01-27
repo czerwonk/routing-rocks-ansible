@@ -150,9 +150,9 @@ filter upstream_as{{ peer.asn }}_in {
 {% elif r.when.prefix is defined %}
   if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
-  if bgp_community ~ {{ r.when.community }} then {
+  if {{ r.when.community }} ~ bgp_community then {
 {% elif r.when.large_community is defined %}
-  if bgp_large_community ~ {{ r.when.large_community }} then {
+  if {{ r.when.large_community }} ~ bgp_large_community then {
 {% endif %}
 {% if r.then.set_local_pref is defined %}
     bgp_local_pref = {{ r.then.set_local_pref }};
@@ -189,9 +189,9 @@ filter peer_as{{ peer.asn }}_in {
 {% elif r.when.prefix is defined %}
     if net ~ [ {{ r.when.prefix }} ] then {
 {% elif r.when.community is defined %}
-    if bgp_community ~ {{ r.when.community }} then {
+    if {{ r.when.community }} ~ bgp_community then {
 {% elif r.when.large_community is defined %}
-    if bgp_large_community ~ {{ r.when.large_community }} then {
+    if {{ r.when.large_community }} ~ bgp_large_community then {
 {% endif %}
 {% if r.then.set_local_pref is defined %}
       bgp_local_pref = {{ r.then.set_local_pref }};
