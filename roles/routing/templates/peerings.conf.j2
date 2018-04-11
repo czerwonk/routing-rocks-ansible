@@ -26,6 +26,9 @@ protocol bgp {{ session.name }} from generic_bgp {
      import filter {{ peers[peering.asn].filters.import | default('drain') }};
      export filter {{ peers[peering.asn].filters.export | default('drain') }};
 {% endif %}
+{% if peers[peering.asn].max_prefix is defined %}
+     receive limit {{ session.ip | ipv6() | ternary(peers[peering.asn].max_prefix.ipv6, peers[peering.asn].max_prefix.ipv4) }};
+{% endif %}
   };
 {% if peering.local_pref is defined %}
   default bgp_local_pref {{ peering.local_pref }};
