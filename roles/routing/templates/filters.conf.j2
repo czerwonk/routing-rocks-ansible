@@ -180,7 +180,7 @@ filter peer_as{{ peer.asn }}_in {
 {% if peers[peer.asn].as_set is defined %}
   if net ~ {{ peers[peer.asn].as_set }}_IPv4 || net ~ {{ peers[peer.asn].as_set }}_IPv6 then {
 {% else %}
-  if net ~ 0.0.0.0/0{8,24} || net ~ ::/0{0,48} then {
+  if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
 {% endif %}
     tag_peering();
 {% if peers[peer.asn].downstream | default(false) %}
