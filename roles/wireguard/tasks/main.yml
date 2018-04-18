@@ -32,7 +32,7 @@
   register: systemd_unit
 
 - name: Reload systemd
-  shell: systemctl daemon-reload
+  systemd: daemon_reload=yes
   when: systemd_unit.changed
 
 - name: Ensure service is enabled
