@@ -5,7 +5,7 @@
   register: service_unit
 
 - name: Reload systemd configuration
-  shell: systemctl daemon-reload
+  systemd: daemon_reload=yes
   when: service_unit.changed
 
 - name: Enable service
