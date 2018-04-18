@@ -27,7 +27,7 @@
 
 - block:
   - name: Reload systemd
-    shell: systemctl daemon-reload
+    systemd: daemon_reload=yes
 
   - name: Ensure service is enabled
     service: name=caddy enabled=yes
