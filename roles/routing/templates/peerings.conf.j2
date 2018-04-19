@@ -13,7 +13,7 @@ protocol bgp {{ session.name }} from generic_bgp {
 {% elif peering.source_ip is defined %}
   source address {{ peering.source_ip }};
 {% endif %}
-  {% if session.ip | ipv6() == False %}ipv4{% else %}ipv6{% endif %}{
+  {% if session.ip | ipv6() == False %}ipv4{% else %}ipv6{% endif %} {
      next hop self;
      import keep filtered;
 {% if session.filters is defined %}
