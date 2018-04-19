@@ -178,7 +178,7 @@ filter peer_as{{ peer.asn }}_in {
   if is_tagged_with_own_community() then reject;
 
 {% if peers[peer.asn].as_set is defined %}
-  if net ~ {{ peers[peer.asn].as_set }}_IPv4 || net ~ {{ peers[peer.asn].as_set }}_IPv6 then {
+  if net ~ {{ peers[peer.asn].as_set }} then {
 {% else %}
   if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
 {% endif %}
