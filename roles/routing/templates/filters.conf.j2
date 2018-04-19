@@ -81,7 +81,7 @@ function should_announce_ebgp() {
   }
 
   if is_downstream_route() then {
-    return (net.type = NET_IP4 && net.len <= 24) || (net.type = NET_IP6 && net.len <= 48);;
+    return (net.type = NET_IP4 && net.len <= 24) || (net.type = NET_IP6 && net.len <= 48);
   }
 
   return false;
