@@ -38,10 +38,10 @@ function is_default_route() {
 
 function is_own_prefix() {
 {% for p in prefixes.ipv4 | default([]) %}
-  if net = {{ p }} then return true;
+  if net ~ {{ p }} then return true;
 {% endfor %}
 {% for p in prefixes.ipv6 | default([]) %}
-  if net = {{ p }} then return true;
+  if net ~ {{ p }} then return true;
 {% endfor %}
   return false;
 }
@@ -75,6 +75,10 @@ filter full_view {
 }
 
 function should_announce_ebgp() {
+ if (net.type = NET_IP4 && net.len > 24) || (net.type = NET_IP6 && net.len > 48) then {
+   return false;
+  }
+
   if is_own_prefix() then {
     tag_origin();
     return true; 
@@ -217,16 +221,9 @@ filter peer_as{{ peer.asn }}_in {
 filter bb_ibgp_in {
   if DRAINED then reject;
 
-{% for p in prefixes.ipv4 | default([]) %}
-  if net ~ [ {{ p }}{8,24} ] then {
+  if is_own_prefix() && (net.type = NET_IP4 && net.len > 24) || (net.type = NET_IP6 && net.len > 52) then {
     accept;
   }
-{% endfor %}
-{% for p in prefixes.ipv6 | default([]) %}
-  if net ~ [ {{ p }}{52,64} ] then {
-    accept;
-  }
-{% endfor %}
 
   reject;
 }
@@ -234,16 +231,9 @@ filter bb_ibgp_in {
 filter site_ibgp_out {
   if DRAINED then reject;
 
-{% for p in prefixes.ipv4 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{24,24} ] then {
+  if is_own_prefix() && (source = RTS_STATIC || source = RTS_DEVICE) then {
     accept;
   }
-{% endfor %}
-{% for p in prefixes.ipv6 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{64,64} ] then {
-    accept;
-  }
-{% endfor %}
 
   reject;
 }
@@ -251,16 +241,9 @@ filter site_ibgp_out {
 filter bb_ibgp_out {
   if DRAINED then reject;
 
-{% for p in prefixes.ipv4 | default([]) %}
-  if source = RTS_STATIC && net ~ [ {{ p }}{8,24} ] then {
+  if is_own_prefix() && source = RTS_STATIC then {
     accept;
   }
-{% endfor %}
-{% for p in prefixes.ipv6 | default([]) %}
-  if source = RTS_STATIC && net ~ [ {{ p }}{52,64} ] then {
-    accept;
-  }
-{% endfor %}
 
   reject;
 }
@@ -268,20 +251,13 @@ filter bb_ibgp_out {
 filter bb_ibgp_full_out {
   if is_default_route() then reject;
   
-  if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
+  if is_own_prefix() && (source = RTS_STATIC || source = RTS_DEVICE) then {
     accept;
   }
 
-{% for p in prefixes.ipv4 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{8,24} ] then {
+  if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
     accept;
   }
-{% endfor %}
-{% for p in prefixes.ipv6 | default([]) %}
-  if (source = RTS_STATIC || source = RTS_DEVICE) && net ~ [ {{ p }}{52,64} ] then {
-    accept;
-  }
-{% endfor %}
 
   reject;
 }
@@ -289,7 +265,6 @@ filter bb_ibgp_full_out {
 filter bb_ibgp_local_router_in {
   if is_default_route() then reject;
   if is_bogon() then reject;
-  if is_own_prefix() then reject;
 
   if is_peer_route() then {
     bgp_local_pref = 1000;
