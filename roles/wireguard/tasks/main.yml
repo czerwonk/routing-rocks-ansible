@@ -20,7 +20,7 @@
 - name: Ensure file permissions are set correctly
   file: path=/etc/wireguard/privatekey mode=0400 state=file
 
-- name: Ensure script are present
+- name: Ensure scripts are present
   template: src={{ item }}.j2 dest=/etc/wireguard/{{ item }}.sh owner=root mode=0750
   with_items:
     - start
