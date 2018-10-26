@@ -1,2 +1,10 @@
 #!/bin/sh
+{% if iface.type == 'Tunnel' and iface.ipv6 is defined %}
 ip -6 addr add {{ iface.ipv6.address }} dev {{ iface.name }}
+{% endif %}
+{% if iface.vrf is defined %}
+ip link set {{ iface.name }} master {{ iface.vrf }}
+{% endif %}
+{% for cmd in iface.post_up | default([]) %}
+{{ cmd }}
+{% endfor %}

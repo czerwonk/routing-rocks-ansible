@@ -16,4 +16,7 @@ ip -6 addr add {{ iface.ipv6.address }} dev {{ iface.name }} scope link
 wg set {{ iface.name }} private-key /etc/wireguard/privatekey peer {{ iface.peer }} endpoint {{ iface.endpoint }} allowed-ips 0.0.0.0/0,::/0
 {% endif %}
 ip link set up dev {{ iface.name }}
+{% for cmd in iface.post_up | default([]) %}
+{{ cmd }}
+{% endfor %}
 {% endfor %}

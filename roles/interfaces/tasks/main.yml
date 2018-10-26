@@ -31,12 +31,15 @@
   when: iface.type == 'Tunnel'
   notify: Restart network
 
-- name: Ensure tunnel IPv6 post-up scripts exist
+- name: Ensure post-up scripts exist
+  template: src=postup-lo.j2 dest=/etc/sysconfig/network-scripts/postup-lo mode=0744 owner=root
+  notify: Restart network
+
+- name: Ensure post-up scripts exist
   template: src=postup.j2 dest=/etc/sysconfig/network-scripts/postup-{{ iface.name }} mode=0744 owner=root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
-  when: iface.type == 'Tunnel' and iface.ipv6 is defined
   notify: Restart network
  
 - template: src=ifcfg-sit.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
