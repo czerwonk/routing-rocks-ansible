@@ -7,7 +7,7 @@
   file: path=/var/kea state=directory mode=0755 owner=root
 
 - name: Ensure config is up to date
-  template: src=kea.conf.j2 dest=/etc/kea/kea.conf owner=root mode=0644
+  template: src=kea.conf.j2 dest=/etc/kea/kea-dhcp4.conf owner=root mode=0644
   notify: Restart kea
 
 - name: Ensure service is enabled
