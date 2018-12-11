@@ -42,21 +42,21 @@ protocol kernel kernel6 {
 {% if routing_tables is defined %}
 {% for table in routing_tables | default([]) %}
 
-table {{ table.name }}_ipv4;
+ipv4 table {{ table.name }}_ipv4;
 protocol kernel kernel_{{ table.name }}_ipv4 {
-  table {{ table.name }}_ipv4;
   kernel table {{ table.kernel_table }};
   ipv4 {
+    table {{ table.name }}_ipv4;
     import all;
     export all;
   };
 }
 
-table {{ table.name }}_ipv6;
+ipv6 table {{ table.name }}_ipv6;
 protocol kernel kernel_{{ table.name }}_ipv6 {
-  table {{ table.name }}_ipv6;
   kernel table {{ table.kernel_table }};
   ipv6 {
+    table {{ table.name }}_ipv6;
     import all;
     export all;
   };
