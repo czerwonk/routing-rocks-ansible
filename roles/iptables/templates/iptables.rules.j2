@@ -2,6 +2,9 @@
 {% for iface in firewall.interfaces.outside %}
 -A POSTROUTING -o {{ iface }} -j SNAT --to {{ firewall.nat_ip }} 
 {% endfor %}
+{% for rule in firewall.nat_rules | default([]) %}
+-A POSTROUTING {{ rule }}
+{% endfor %}
 COMMIT
 
 *mangle
