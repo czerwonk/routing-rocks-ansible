@@ -1,7 +1,7 @@
 ---
 
 - name: Ensure newest caddy version is installed
-  shell: {{ go_path }}/go get -u github.com/mholt/caddy/caddy
+  shell: "{{ go_path }}/go get -u github.com/mholt/caddy/caddy"
   environment:
     GOPATH: /usr/local
   tags:

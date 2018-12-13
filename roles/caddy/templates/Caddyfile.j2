@@ -1,5 +1,18 @@
 {% for site in caddy.sites | default([]) %}
 {{ site.domain }} {
+{% if site.allowed_ips is defined %}
+  ipfilter / {
+    rule allow
+    ip {{ site.allowed_ips }}
+  }
+{% endif %}
+{% for redir in site.redirects | default([]) %}
+{% if redir.from is defined %}
+  redir {{ redir.from }} {{ redir.to }}
+{% else %}
+  redir {{ redir.to }}
+{% endif %}
+{% endfor %}
 {% if site.root is defined %}
   root {{ site.root }}
 {% endif %}
