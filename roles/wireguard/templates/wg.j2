@@ -1,7 +1,8 @@
 [Interface]
-{% if wireguard_role | default('server') == 'server' %}
 Table = off
 FwMark = off
+{% if wireguard_role | default('server') == 'server' %}
+ListenPort = {{ iface.port }}
 {% if wireguard_host.addresses is defined and wireguard_host.addresses[iface.name] is defined and wireguard_host.addresses[iface.name].ipv4 is defined %}
 Address = {{ wireguard_host.addresses[iface.name].ipv4 }}
 {% else %}
@@ -20,7 +21,6 @@ Address = {{ iface.ipv4.address }}
 Address = {{ iface.ipv6.address }}
 {% endif %}
 {% endif %}
-ListenPort = {{ iface.port }}
 PrivateKey = {{ wireguard_host.private_key }}
 {% for cmd in iface.post_up | default([]) %}
 PostUp = {{ cmd }}
@@ -29,3 +29,6 @@ PostUp = {{ cmd }}
 [Peer]
 PublicKey = {{ iface.peer }}
 AllowedIPs = 0.0.0.0/0,::/0
+{% if iface.endpoint is defined %}
+Endpoint = {{ iface.endpoint }}
+{% endif %}
