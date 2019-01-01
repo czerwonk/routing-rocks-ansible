@@ -1,4 +1,0 @@
-#!/bin/sh
-{% for iface in wireguard.interfaces %}
-ip link del {{ iface.name }}
-{% endfor %}

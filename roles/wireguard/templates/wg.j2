@@ -1,0 +1,23 @@
+[Interface]
+{% if wireguard_role | default('server') == 'server' %}
+Table = off
+FwMark = off
+Address = {{ wireguard_net | ipsubnet(31, iface.subnet) | ipaddr(0) }}
+Address = {{ wireguard_net_local6 | ipsubnet(64, iface.subnet) | ipaddr(1) }}
+{% else %}
+{% if iface.ipv4 is defined %}
+Address = {{ iface.ipv4.address }}
+{% endif %}
+{% if iface.ipv6 is defined %}
+Address = {{ iface.ipv6.address }}
+{% endif %}
+{% endif %}
+ListenPort = {{ iface.port }}
+PrivateKey = {{ wireguard_private_key }}
+{% for cmd in iface.post_up | default([]) %}
+PostUp = {{ cmd }}
+{% endfor %}
+
+[Peer]
+PublicKey = {{ iface.peer }}
+AllowedIPs = 0.0.0.0/0,::/0

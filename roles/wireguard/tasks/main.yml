@@ -20,23 +20,8 @@
 - name: Ensure file permissions are set correctly
   file: path=/etc/wireguard/privatekey mode=0400 state=file
 
-- name: Ensure scripts are present
-  template: src={{ item }}.j2 dest=/etc/wireguard/{{ item }}.sh owner=root mode=0750
-  with_items:
-    - start
-    - stop
-  notify: Restart wireguard
-
-- name: Ensure systemd unit exists
-  copy: src=wireguard.service dest=/lib/systemd/system/wireguard.service owner=root mode=0644
-  register: systemd_unit
-
-- name: Reload systemd
-  systemd: daemon_reload=yes
-  when: systemd_unit.changed
-
-- name: Ensure service is enabled
-  service: name=wireguard enabled=yes
-
-- name: Ensure service is started
-  service: name=wireguard state=started
+- name: Configure interfaces
+  include_tasks: wg_interface.yml
+  vars:
+    iface: "{{ item }}"
+  with_items: "{{ wireguard.interfaces }}"
