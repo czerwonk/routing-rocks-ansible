@@ -2,8 +2,16 @@
 {% if wireguard_role | default('server') == 'server' %}
 Table = off
 FwMark = off
-Address = {{ wireguard_net | ipsubnet(31, iface.subnet) | ipaddr(0) }}
-Address = {{ wireguard_net_local6 | ipsubnet(64, iface.subnet) | ipaddr(1) }}
+{% if wireguard_host.addresses is defined and wireguard_host.addresses[iface.name] is defined and wireguard_host.addresses[iface.name].ipv4 is defined %}
+Address = {{ wireguard_host.addresses[iface.name].ipv4 }}
+{% else %}
+Address = {{ wireguard_host.net_ipv4 | ipsubnet(31, iface.subnet) | ipaddr(0) }}
+{% endif %}
+{% if wireguard_host.addresses is defined and wireguard_host.addresses[iface.name] is defined and wireguard_host.addresses[iface.name].ipv6 is defined %}
+Address = {{ wireguard_host.addresses[iface.name].ipv6 }}
+{% else %}
+Address = {{ wireguard_host.net_ipv6 | ipsubnet(64, iface.subnet) | ipaddr(1) }}
+{% endif %}
 {% else %}
 {% if iface.ipv4 is defined %}
 Address = {{ iface.ipv4.address }}
@@ -13,7 +21,7 @@ Address = {{ iface.ipv6.address }}
 {% endif %}
 {% endif %}
 ListenPort = {{ iface.port }}
-PrivateKey = {{ wireguard_private_key }}
+PrivateKey = {{ wireguard_host.private_key }}
 {% for cmd in iface.post_up | default([]) %}
 PostUp = {{ cmd }}
 {% endfor %}
