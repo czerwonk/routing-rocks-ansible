@@ -1,0 +1,26 @@
+---
+
+- name: Ensure config dir exists
+  file: name=/etc/prometheus state=directory owner=root mode=0755
+
+- name: Ensure data dir exists
+  file: name=/var/prometheus state=directory owner=nobody mode=0755
+
+- name: Configure prometheus
+  copy: src=~/routing-rocks/config/prometheus dest=/etc/prometheus owner=root mode=0644
+  notify: Restart prometheus
+
+- name: Ensure docker container is running
+  docker_container:
+    name: prometheus
+    image: prom/prometheus
+    state: started
+    pull: true
+    volumes:
+      - "/var/prometheus:/prometheus"
+      - "/etc/prometheus:/etc/prometheus"
+    ports:
+      - "9090:9090"
+    restart_policy: always
+    command: "--web.external-url=https://{{ prometheus.fqdn }} --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention=90d --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.enable-lifecycle"
+
