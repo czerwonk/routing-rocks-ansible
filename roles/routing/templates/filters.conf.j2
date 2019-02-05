@@ -188,9 +188,11 @@ filter peer_as{{ peering.asn }}_in {
     tag_downstream();
 {% endif %}
 {% if peer.ixp | default(false) %}
+
     if is_upstream_route() then {
       bgp_local_pref = {{ last_resort_local_pref }};
     }
+
 {% endif %}
 {% set rules = (peering.rules | default(peer.rules)) %}
 {% include "templates/rules.j2" %}
