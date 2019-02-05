@@ -20,29 +20,29 @@ template bgp generic_bgp {
 
 function tag_origin() {
   bgp_large_community.add({{ communities.origin }});
-{% if communities_local is defined %}
-  bgp_large_community.add({{ communities_local.origin }});
+{% if communities_metro is defined %}
+  bgp_large_community.add({{ communities_metro.origin }});
 {% endif %}
 }
 
 function tag_upstream() {
   bgp_large_community.add({{ communities.upstream_import }});
-{% if communities_local is defined %}
-  bgp_large_community.add({{ communities_local.upstream_import }});
+{% if communities_metro is defined %}
+  bgp_large_community.add({{ communities_metro.upstream_import }});
 {% endif %}
 }
 
 function tag_downstream() {
   bgp_large_community.add({{ communities.downstream_import }});
-{% if communities_local is defined %}
-  bgp_large_community.add({{ communities_local.downstream_import }});
+{% if communities_metro is defined %}
+  bgp_large_community.add({{ communities_metro.downstream_import }});
 {% endif %}
 }
 
 function tag_peering() {
   bgp_large_community.add({{ communities.peer_import }});
-{% if communities_local is defined %}
-  bgp_large_community.add({{ communities_local.peer_import }});
+{% if communities_metro is defined %}
+  bgp_large_community.add({{ communities_metro.peer_import }});
 {% endif %}
 }
 

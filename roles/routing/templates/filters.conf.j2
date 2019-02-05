@@ -262,7 +262,7 @@ filter bb_ibgp_full_out {
   reject;
 }
 
-filter bb_ibgp_local_router_in {
+filter bb_ibgp_metro_router_in {
   if is_default_route() then reject;
   if is_bogon() then reject;
 
