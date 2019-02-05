@@ -57,6 +57,15 @@ filter drain {
   reject;
 }
 
+function is_upstream_route() {
+{% for peer in peers %}
+{% if peers[peer].upstream | default(false) %}
+  if as_path.first = {{ peer }} then return true;
+{% endif %}
+{% endfor %}
+  return false;
+}
+
 filter accept_all {
   if DRAINED then reject;
   accept;
@@ -110,24 +119,27 @@ function default_ebgp_out() {
   return false;
 }
 
-{% for peer in peerings | default([]) %}
-{% if peer.asn != asn %}
-filter ebgp_as{{ peer.asn }}_out {
-{% if peers[peer.asn].rtbh_community is defined %}
+{% for peering in peerings | default([]) %}
+{% if peering.asn != asn %}
+{% set peer = peers[peering.asn] %}
+{% set peer_type = peer_types[peer.type] %}
+filter ebgp_as{{ peering.asn }}_out {
+{% if peer.rtbh_community is defined %}
   if is_rtbh() then {
-    bgp_community.add(peers[peer.asn].rtbh_community);
+    bgp_community.add(peer.rtbh_community);
     accept;
   }
 
 {% endif %}
   if default_ebgp_out() then {
-{% for i in range(peers[peer.asn].as_prepend | default(peer.as_prepend) | default(0)) %}
+{% set as_prepend = peering.as_prepend | default(peer.as_prepend | default(peer_type.as_prepend)) %}
+{% for i in range(as_prepend | default(0)) %}
     bgp_path.prepend({{ asn }});
 {% endfor %}
-{% for c in peer.communities | default(peers[peer.asn].communities) | default([]) %}
+{% for c in peering.communities | default(peer.communities) | default([]) %}
     bgp_community.add({{ c }});
 {% endfor %} 
-{% for c in peer.large_communities | default(peers[peer.asn].large_communities) | default([]) %}
+{% for c in peering.large_communities | default(peer.large_communities) | default([]) %}
     bgp_large_community.add({{ c }});
 {% endfor %} 
     accept;
@@ -138,78 +150,50 @@ filter ebgp_as{{ peer.asn }}_out {
 
 {% endif %}
 {% endfor %}
-{% for peer in peerings | default([]) %}
-{% if peers[peer.asn].upstream | default(false) %}
-filter upstream_as{{ peer.asn }}_in {
+{% for peering in peerings | default([]) %}
+{% set peer = peers[peering.asn] %}
+{% if peer.upstream | default(false) %}
+filter upstream_as{{ peering.asn }}_in {
   if DRAINED then reject;
   if is_bogon() then reject;
   if is_own_prefix() then reject;
   if is_tagged_with_own_community() then reject;
 
   tag_upstream();
+{% set rules = (peering.rules | default(peer.rules)) %}
+{% include "templates/rules.j2" %}
 
-{% for r in peers[peer.asn].rules | default([]) %}
-{% if r.when.source_as is defined %}
-  if bgp_path.last = {{ r.when.source_as }}{% if r.ip_version is defined %} && net.type = NET_IP{{ r.ip_version }}{% endif %} then {
-{% elif r.when.prefix is defined %}
-  if net ~ [ {{ r.when.prefix }} ] then {
-{% elif r.when.community is defined %}
-  if {{ r.when.community }} ~ bgp_community then {
-{% elif r.when.large_community is defined %}
-  if {{ r.when.large_community }} ~ bgp_large_community then {
-{% endif %}
-{% if r.then.set_local_pref is defined %}
-    bgp_local_pref = {{ r.then.set_local_pref }};
-{% elif r.then.add_community is defined %}
-    bgp_community.add({{ r.then.add_community }});
-{% elif r.then.add_large_community is defined %}
-    bgp_large_community.add({{ r.then.add_large_community }});
-{% endif %}
-  }
-
-{% endfor %}
   accept;
 }
 
 {% endif %}
 {% endfor %}
-{% for peer in peerings | default([]) %}
-{% if peers[peer.asn].as_set is defined or peers[peer.asn].max_prefix is defined %}
-filter peer_as{{ peer.asn }}_in {
+{% for peering in peerings | default([]) %}
+{% set peer = peers[peering.asn] %}
+{% set peer_type = peer_types[peer.type] %}
+{% if peer.as_set is defined or peer.max_prefix is defined %}
+filter peer_as{{ peering.asn }}_in {
   if DRAINED then reject;
   if is_bogon() then reject;
   if is_own_prefix() then reject;
   if is_tagged_with_own_community() then reject;
 
-{% if peers[peer.asn].as_set is defined %}
-  if net ~ {{ peers[peer.asn].as_set }} then {
+{% if peer.as_set is defined %}
+  if net ~ {{ peer.as_set }} then {
 {% else %}
   if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
 {% endif %}
     tag_peering();
-{% if peers[peer.asn].downstream | default(false) %}
+{% if peer.downstream | default(false) %}
     tag_downstream();
 {% endif %}
-{% for r in peers[peer.asn].rules | default([]) %}
-
-{% if r.when.source_as is defined %}
-    if bgp_path.last = {{ r.when.source_as }}{% if r.ip_version is defined %} && net.type = NET_IP{{ r.ip_version }}{% endif %} then {
-{% elif r.when.prefix is defined %}
-    if net ~ [ {{ r.when.prefix }} ] then {
-{% elif r.when.community is defined %}
-    if {{ r.when.community }} ~ bgp_community then {
-{% elif r.when.large_community is defined %}
-    if {{ r.when.large_community }} ~ bgp_large_community then {
-{% endif %}
-{% if r.then.set_local_pref is defined %}
-      bgp_local_pref = {{ r.then.set_local_pref }};
-{% elif r.then.add_community is defined %}
-      bgp_community.add({{ r.then.add_community }});
-{% elif r.then.add_large_community is defined %}
-      bgp_large_community.add({{ r.then.add_large_community }});
-{% endif %}
+{% if peer.ixp | default(false) %}
+    if is_upstream_route() then {
+      bgp_local_pref = {{ last_resort_local_pref }};
     }
-{% endfor %}
+{% endif %}
+{% set rules = (peering.rules | default(peer.rules)) %}
+{% include "templates/rules.j2" %}
     accept;
   }
 

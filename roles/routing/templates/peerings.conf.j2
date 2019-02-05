@@ -1,4 +1,6 @@
 {% for peering in peerings %}
+{% set peer = peers[peering.asn] %}
+{% set peer_type = peer_types[peer.type] %}
 {% for session in peering.sessions %}
 protocol bgp {{ session.name }} from generic_bgp {
 {% if peering.table is defined %}
@@ -16,22 +18,16 @@ protocol bgp {{ session.name }} from generic_bgp {
   {% if session.ip | ipv6() == False %}ipv4{% else %}ipv6{% endif %} {
      next hop self;
      import keep filtered;
-{% if session.filters is defined %}
-     import filter {{ session.filters.import | default('drain') }};
-     export filter {{ session.filters.export | default('drain') }};
-{% elif peering.filters is defined %}
-     import filter {{ peering.filters.import | default('drain') }};
-     export filter {{ peering.filters.export | default('drain') }};
-{% else %}
-     import filter {{ peers[peering.asn].filters.import | default('drain') }};
-     export filter {{ peers[peering.asn].filters.export | default('drain') }};
-{% endif %}
+{% set filters = (session.filters | default(peering.filters)) | default(peer.filters) %}
+     import filter {{ filters.import | default('drain') }};
+     export filter {{ filters.export | default('drain') }};
 {% if peers[peering.asn].max_prefix is defined %}
-     receive limit {{ session.ip | ipv6() | ternary(peers[peering.asn].max_prefix.ipv6, peers[peering.asn].max_prefix.ipv4) }};
+     receive limit {{ session.ip | ipv6() | ternary(peer.max_prefix.ipv6, peer.max_prefix.ipv4) }};
 {% endif %}
   };
-{% if peering.local_pref is defined %}
-  default bgp_local_pref {{ peering.local_pref }};
+{% set local_pref = (peering.local_pref | default(peer_type.local_pref)) %}
+{% if local_pref is defined and (local_pref | int) != 100 %}
+  default bgp_local_pref {{ local_pref }};
 {% endif %}
 {% if peering.multihop is defined %}
   multihop {{ peering.multihop }};
