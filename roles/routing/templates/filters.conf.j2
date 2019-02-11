@@ -60,7 +60,7 @@ filter drain {
 function is_upstream_route() {
 {% for peer in peers %}
 {% if peers[peer].upstream | default(false) %}
-  if as_path.first = {{ peer }} then return true;
+  if bgp_path.first = {{ peer }} then return true;
 {% endif %}
 {% endfor %}
   return false;
