@@ -20,7 +20,7 @@
       - "/var/prometheus:/prometheus"
       - "/etc/prometheus:/etc/prometheus"
     ports:
-      - "9000:9000"
+      - "9000:9090"
     restart_policy: always
     command: "--web.external-url=https://{{ prometheus.fqdn }} --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention=90d --web.console.libraries=/usr/share/prometheus/console_libraries --web.console.templates=/usr/share/prometheus/consoles --web.enable-lifecycle"
 
