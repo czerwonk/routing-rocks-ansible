@@ -7,4 +7,4 @@
     remote_src: true
 
 - name: Install module
-  shell: dkms install /usr/src/Jool-{{ jool_version }}
+  shell: dkms install /usr/src/jool-{{ jool_version }}

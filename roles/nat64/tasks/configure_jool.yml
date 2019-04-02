@@ -1,7 +1,7 @@
 ---
 
 - name: Download newest version
-  get_url: url=https://github.com/NICMx/releases/raw/master/Jool/Jool-{{ jool_version }}.zip dest=/usr/src/jool-{{ jool_version }}.zip
+  get_url: url=https://github.com/NICMx/Jool/releases/download/v{{ jool_version }}/jool_{{ jool_version }}.tar.gz dest=/usr/src/jool-{{ jool_version }}.zip
   register: jool_sources
 
 - include_tasks: 'build_jool.yml'
