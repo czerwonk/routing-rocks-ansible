@@ -7,7 +7,7 @@
   file: name=/var/prometheus state=directory owner=nobody mode=0755
 
 - name: Configure prometheus
-  copy: src=~/routing-rocks/config/prometheus dest=/etc/prometheus owner=root mode=0644
+  copy: src=~/routing-rocks/config/prometheus/ dest=/etc/prometheus owner=root mode=0644
   notify: Restart prometheus
 
 - name: Ensure docker container is running
