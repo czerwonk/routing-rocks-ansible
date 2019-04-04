@@ -1,3 +1,8 @@
+{% if nat64 is defined %}
+*mangle
+-A PREROUTING -d {{ nat64.pool6 }} -j JOOL --instance "nat64"
+
+{% endif %}
 *raw
 :PREROUTING ACCEPT [0:0]
 {% for iface in firewall.interfaces.inside | default([]) %}

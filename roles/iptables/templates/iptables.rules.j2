@@ -14,6 +14,11 @@ COMMIT
 {% if pppoe | default(false) %}
 -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o ppp+ -j TCPMSS --set-mss 1452
 {% endif %}
+{% if nat64 is defined %}
+-A PREROUTING -d {{ firewall.nat_ip }} -p tcp --dport 61001:65535 -j JOOL --instance "nat64"
+-A PREROUTING -d {{ firewall.nat_ip }} -p udp --dport 61001:65535 -j JOOL --instance "nat64"
+-A PREROUTING -d {{ firewall.nat_ip }} -p icmp -j JOOL --instance "nat64"
+{% endif %}
 COMMIT
 
 *filter

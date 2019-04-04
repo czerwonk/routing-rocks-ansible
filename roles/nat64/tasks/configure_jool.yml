@@ -8,8 +8,18 @@
   when: jool_sources.changed
 
 - name: Ensure module is configured
-  copy: dest=/etc/modules-load.d/jool.conf content="jool pool6=64:ff9b::/96" mode=0644 owner=root
+  copy: dest=/etc/modules-load.d/jool.conf content="jool" mode=0644 owner=root
 
 - name: Ensure kernel module is started
-  shell: modprobe jool pool6=64:ff9b::/96
+  shell: modprobe jool
 
+- name: Ensure service is installed
+  template: src=jool.service.j2 dest=/lib/systemd/system/jool.service mode=0644 owner=root
+  register: systemd
+
+- name: Relaod systemd
+  systemd: daemon_reload=yes
+  when: systemd.changed
+
+- name: Ensure jool is enabled and started
+  systemd: name=jool enabled=yes state=started

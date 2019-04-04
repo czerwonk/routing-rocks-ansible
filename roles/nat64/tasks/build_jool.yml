@@ -8,3 +8,11 @@
 
 - name: Install module
   shell: dkms install /usr/src/jool-{{ jool_version }}
+
+- name: Configure userland tool build
+  shell: cd /usr/src/jool-{{ jool_version }} && ./configure
+
+- name: Install userland tools
+  make:
+    chdir: /usr/src/jool-{{ jool_version }}
+    target: install
