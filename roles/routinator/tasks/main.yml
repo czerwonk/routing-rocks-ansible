@@ -1,0 +1,16 @@
+- name: Create TAL directory
+  file: path=/etc/routinator/tals state=directory owner=root mode=0755
+
+- name: Ensure TAL exists
+  get_url: url=https://www.arin.net/resources/manage/rpki/arin-rfc7730.tal dest=/etc/routinator/tals/
+
+- name: Ensure routinator is configured
+  docker_container:
+    name: routinator
+    image: nlnetlabs/routinator
+    ports:
+    - "127.0.0.1:3323:3323"
+    restart_policy: always
+    state: started
+    volumes:
+    - /etc/routinator/tals/arin-rfc7730.tal:/root/.rpki-cache/tals/arin.tal

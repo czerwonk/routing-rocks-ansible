@@ -8,6 +8,7 @@
     - forwarding
     - iptables
     - rc_local
+    - routinator
     - routing
     - node_exporter
     - bird_exporter
