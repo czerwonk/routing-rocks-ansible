@@ -53,6 +53,16 @@ function is_rtbh() {
   return false;
 }
 
+{% if rpki_validation | default(yes) %}
+function is_rpki_invalid() {
+  if net.type = NET_IP4 then {
+    return roa_check(r4, net, bgp_path.last) = ROA_INVALID;
+  }
+
+  return roa_check(r6, net, bgp_path.last) = ROA_INVALID;
+}
+
+{% endif %}
 filter drain {
   reject;
 }
@@ -119,6 +129,36 @@ function default_ebgp_out() {
   return false;
 }
 
+function should_filter_in_peer() {
+  if DRAINED then {
+    return true;
+  }
+
+  if is_bogon() then {
+    print "Reject: Bogon prefix: ", net, " ", bgp_path;
+    return true;
+  }
+
+  if is_own_prefix() then {
+    print "Reject: Own prefix: ", net, " ", bgp_path;
+    return true;
+  }
+
+  if is_tagged_with_own_community() then {
+    print "Reject: Tagged with our community: ", net, " ", bgp_path;
+    return true;
+  }
+
+{% if rpki_validation | default(yes) %}
+  if is_rpki_invalid() then {
+    print "Reject: RPKI invalid: ", net, " ", bgp_path;
+    return true;
+  }
+
+{% endif %}
+  return false;
+}
+
 {% for peering in peerings | default([]) %}
 {% if peering.asn != asn %}
 {% set peer = peers[peering.asn] %}
@@ -154,10 +194,7 @@ filter ebgp_as{{ peering.asn }}_out {
 {% set peer = peers[peering.asn] %}
 {% if peer.upstream | default(false) %}
 filter upstream_as{{ peering.asn }}_in {
-  if DRAINED then reject;
-  if is_bogon() then reject;
-  if is_own_prefix() then reject;
-  if is_tagged_with_own_community() then reject;
+  if should_filter_in_peer() then reject;
 
   tag_upstream();
 {% set rules = (peering.rules | default(peer.rules)) %}
@@ -173,10 +210,7 @@ filter upstream_as{{ peering.asn }}_in {
 {% set peer_type = peer_types[peer.type] %}
 {% if peer.as_set is defined or peer.max_prefix is defined %}
 filter peer_as{{ peering.asn }}_in {
-  if DRAINED then reject;
-  if is_bogon() then reject;
-  if is_own_prefix() then reject;
-  if is_tagged_with_own_community() then reject;
+  if should_filter_in_peer() then reject;
 
 {% if peer.as_set is defined %}
   if net ~ {{ peer.as_set }} then {
