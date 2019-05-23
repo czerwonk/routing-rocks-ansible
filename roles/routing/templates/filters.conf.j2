@@ -136,22 +136,26 @@ function should_filter_in_peer() {
 
   if is_bogon() then {
     print "Reject: Bogon prefix: ", net, " ", bgp_path;
+    bgp_large_community.add({{ communities.filtered_bogon }});
     return true;
   }
 
   if is_own_prefix() then {
     print "Reject: Own prefix: ", net, " ", bgp_path;
+    bgp_large_community.add({{ communities.filtered_own_prefix }});
     return true;
   }
 
   if is_tagged_with_own_community() then {
     print "Reject: Tagged with our community: ", net, " ", bgp_path;
+    bgp_large_community.add({{ communities.filtered_own_communities }});
     return true;
   }
 
 {% if rpki_validation | default(yes) %}
   if is_rpki_invalid() then {
     print "Reject: RPKI invalid: ", net, " ", bgp_path;
+    bgp_large_community.add({{ communities.filtered_rpki_invalid }});
     return true;
   }
 
