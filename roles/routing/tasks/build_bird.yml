@@ -7,6 +7,7 @@
     - bison
     - ncurses-devel
     - readline-devel
+    - libssh-devel
 
 - name: Ensure build dir does not exist
   file: path=/tmp/bird state=absent
@@ -18,7 +19,7 @@
     remote_src: true
 
 - name: Configure bird build
-  shell: cd /tmp/bird-{{ bird_version }} && ./configure --sysconfdir=/etc/bird
+  shell: cd /tmp/bird-{{ bird_version }} && ./configure --sysconfdir=/etc/bird --with-protocols="bfd bgp ospf pipe radv static rpki" --enable-libssh
 
 - make:
     chdir: "/tmp/bird-{{ bird_version }}"

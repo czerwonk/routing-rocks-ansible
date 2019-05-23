@@ -11,12 +11,26 @@ define BOGON_ASNS = [ 0,                      # RFC 7607
 define WHITELIST_ASNS = [ {{ asn_whitelist }} ];
 {% endif %}
 
+{% if rpki_validation | default(true) %}
+roa4 table r4;
+roa6 table r6;
+
+protocol rpki {
+  roa4 { table r4; };
+  roa6 { table r6; };
+  remote "{{ rpki_validator_endpoint }}" port 8282;
+  retry keep 5;
+  refresh keep 30;
+  expire 600;
+}
+
+{% endif %}
 template bgp generic_bgp {
   local as {{ asn }};
   enable route refresh on;
   keepalive time 10;
   hold time 30;
-};
+}
 
 function tag_origin() {
   bgp_large_community.add({{ communities.origin }});
