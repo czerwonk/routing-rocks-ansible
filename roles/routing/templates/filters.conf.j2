@@ -129,7 +129,7 @@ function default_ebgp_out() {
   return false;
 }
 
-function should_filter_in_peer() {
+function should_filter_in_peer(int peer_asn; bool ixp) {
   if DRAINED then {
     return true;
   }
@@ -160,6 +160,11 @@ function should_filter_in_peer() {
   }
 
 {% endif %}
+  if !ixp && bgp_path.first != peer_asn then {
+    print "Reject: Unexpected first ASN in AS path, expected ", peer_asn, ": ", net, " ", bgp_path;
+    bgp_large_community.add({{ communities.filtered_aspath_invalid }});
+  }
+
   return false;
 }
 
@@ -198,7 +203,7 @@ filter ebgp_as{{ peering.asn }}_out {
 {% set peer = peers[peering.asn] %}
 {% if peer.upstream | default(false) %}
 filter upstream_as{{ peering.asn }}_in {
-  if should_filter_in_peer() then reject;
+  if should_filter_in_peer({{ peering.asn }}, {{ peer.ixp | default(false) | lower }}) then reject;
 
   tag_upstream();
 {% set rules = (peering.rules | default(peer.rules)) %}
@@ -214,7 +219,7 @@ filter upstream_as{{ peering.asn }}_in {
 {% set peer_type = peer_types[peer.type] %}
 {% if peer.as_set is defined or peer.max_prefix is defined %}
 filter peer_as{{ peering.asn }}_in {
-  if should_filter_in_peer() then reject;
+  if should_filter_in_peer({{ peering.asn }}, {{ peer.ixp | default(false) | lower }}) then reject;
 
 {% if peer.as_set is defined %}
   if net ~ {{ peer.as_set }} then {
