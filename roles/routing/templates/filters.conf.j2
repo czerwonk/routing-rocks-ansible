@@ -94,8 +94,8 @@ filter full_view {
 }
 
 function should_announce_ebgp() {
- if (net.type = NET_IP4 && net.len > 24) || (net.type = NET_IP6 && net.len > 48) then {
-   return false;
+  if (net.type = NET_IP4 && net.len > 24) || (net.type = NET_IP6 && net.len > 48) then {
+    return false;
   }
 
   if is_own_prefix() then {
@@ -104,7 +104,7 @@ function should_announce_ebgp() {
   }
 
   if is_downstream_route() then {
-    return (net.type = NET_IP4 && net.len <= 24) || (net.type = NET_IP6 && net.len <= 48);
+    return true;
   }
 
   return false;
