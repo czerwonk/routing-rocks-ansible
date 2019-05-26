@@ -46,6 +46,18 @@ function is_own_prefix() {
   return false;
 }
 
+function is_peering_lan() {
+{% for asn in peers %}
+{% if peers[asn].ixp | default(false) %}
+  if net ~ [ {{ peers[asn].peering_lans.ipv4 | default([]) | union(peers[asn].peering_lans.ipv6 | default([])) | join(', ') }} ] then {
+    return true;
+  }
+
+{% endif %}
+{% endfor %}
+  return false;
+}
+
 function is_rtbh() {
 {% for p in prefixes.ipv4 | default([]) %}
   if net ~ [ {{ p }}{32,32} ] && gw = 192.168.2.1 then return true;
@@ -85,6 +97,7 @@ filter full_view {
   if DRAINED then reject;
   if is_bogon() then reject;
   if is_default_route() then reject;
+  if is_peering_lan() then reject;
   
   if net ~ [ 0.0.0.0/0{0,24}, ::/0{0,48} ] then {
     accept;
