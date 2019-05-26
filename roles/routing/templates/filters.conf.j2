@@ -49,6 +49,7 @@ function is_own_prefix() {
 function is_peering_lan() {
 {% for asn in peers %}
 {% if peers[asn].ixp | default(false) %}
+  # AS{{ asn }}
   if net ~ [ {{ peers[asn].peering_lans.ipv4 | default([]) | union(peers[asn].peering_lans.ipv6 | default([])) | join(', ') }} ] then {
     return true;
   }
@@ -221,7 +222,7 @@ function reject_invalid_neighbor_asn(int peer_asn) {
 {% for peering in peerings | default([]) %}
 {% if peering.asn != asn %}
 {% set peer = peers[peering.asn] %}
-{% set peer_type = peer_types[peer.type] %}
+{% set peer_type = peer_types[peering.type | default(peer.type)] %}
 filter ebgp_as{{ peering.asn }}_out {
 {% if peer.rtbh_community is defined %}
   if is_rtbh() then {
@@ -267,7 +268,7 @@ filter upstream_as{{ peering.asn }}_in {
 {% endfor %}
 {% for peering in peerings | default([]) %}
 {% set peer = peers[peering.asn] %}
-{% set peer_type = peer_types[peer.type] %}
+{% set peer_type = peer_types[peering.type | default(peer.type)] %}
 {% if peer.as_set is defined or peer.max_prefix is defined %}
 filter peer_as{{ peering.asn }}_in {
   if !default_ebgp_in() then reject;

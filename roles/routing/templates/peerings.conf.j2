@@ -1,6 +1,6 @@
 {% for peering in peerings %}
 {% set peer = peers[peering.asn] %}
-{% set peer_type = peer_types[peer.type] %}
+{% set peer_type = peer_types[peering.type | default(peer.type)] %}
 {% for session in peering.sessions %}
 protocol bgp {{ session.name }} from generic_bgp {
 {% if peering.table is defined %}
@@ -25,7 +25,7 @@ protocol bgp {{ session.name }} from generic_bgp {
      receive limit {{ session.ip | ipv6() | ternary(peer.max_prefix.ipv6, peer.max_prefix.ipv4) }};
 {% endif %}
   };
-{% set local_pref = (peering.local_pref | default(peer_type.local_pref)) %}
+{% set local_pref = (session.local_pref | default(peering.local_pref | default(peer_type.local_pref))) %}
 {% if local_pref is defined and (local_pref | int) != 100 %}
   default bgp_local_pref {{ local_pref }};
 {% endif %}
