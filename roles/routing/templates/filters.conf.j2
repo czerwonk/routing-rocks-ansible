@@ -114,6 +114,8 @@ function should_announce_ebgp() {
 
   if is_own_prefix() then {
     tag_origin();
+    bgp_path.empty;
+    bgp_path.prepend({{ asn }});
     return true; 
   }
 
