@@ -1,7 +1,4 @@
 ---
 
-- name: Reconfigure bird
-  shell: /usr/local/sbin/birdc configure
-
 - name: Restart rsyslog
   service: name=rsyslog state=restarted

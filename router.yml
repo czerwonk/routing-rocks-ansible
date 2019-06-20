@@ -9,7 +9,8 @@
     - iptables
     - rc_local
     - routinator
-    - routing
+    - routing-install
+    - routing-policy
     - node_exporter
     - bird_exporter
     - wireguard
