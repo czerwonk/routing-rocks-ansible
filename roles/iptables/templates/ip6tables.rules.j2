@@ -39,7 +39,7 @@ COMMIT
 {% endfor %}
 -A INPUT -i wg+ -j ACCEPT
 {% for interface in ospf.interfaces | default([]) %}
--A INPUT -i {{ interface | replace('*', '+') }} -p ospf -j ACCEPT
+-A INPUT -i {{ interface.name | replace('*', '+') }} -p ospf -j ACCEPT
 {% endfor %}
 -A INPUT -m conntrack --ctstate INVALID -j DROP_INPUT
 -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
