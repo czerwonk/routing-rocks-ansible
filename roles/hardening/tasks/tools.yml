@@ -1,0 +1,36 @@
+- name: Ensure security relevant tools are installed 
+  dnf:
+    name:
+    - fail2ban
+    - sysstat
+    - rkhunter
+    - libpwquality
+    - openscap-scanner
+    state: present
+
+- name: Ensure fail2ban is configured
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    mode: 644
+  notify: Restart fail2ban
+
+- name: Ensure auditd is configured
+  copy:
+    src: audit.rules
+    dest: /etc/audit/rules.d/log-root.rules
+    owner: root
+    group: root
+    mode: 0600
+  notify: Restart auditd
+
+- name: Ensure system is enabled
+  copy:
+    content: "ENABLED=\"true\""
+    dest: /etc/default/sysstat
+
+- name: Ensure sysstat daemon is enabled
+  systemd:
+    name: sysstat
+    state: started
+    enabled: yes

@@ -4,6 +4,19 @@ Description=Node Exporter
 [Service]
 User=daemon
 ExecStart=/usr/local/bin/node_exporter
+NoNewPrivileges=yes
+ProtectControlGroups=true
+ProtectKernelModules=yes
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectClock=true
+ProtectHostname=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
 
 [Install]
 WantedBy=default.target

@@ -4,6 +4,23 @@ Description=Bird Exporter
 [Service]
 User=root
 ExecStart=/usr/local/bin/bird_exporter -bird.v2=true -bird.socket=/usr/local/var/run/bird.ctl -format.new=true
+NoNewPrivileges=yes
+PrivateDevices=true
+PrivateTmp=yes
+ProtectControlGroups=true
+ProtectKernelModules=yes
+ProtectKernelTunables=true
+ProtectSystem=strict
+ProtectClock=true
+ProtectHostname=true
+ProtectHome=true
+DevicePolicy=closed
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
 
 [Install]
 WantedBy=default.target

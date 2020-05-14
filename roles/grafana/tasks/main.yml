@@ -1,7 +1,9 @@
----
-
 - name: Ensure data dir exists
-  file: name=/var/grafana state=directory owner=472 mode=0755
+  file: 
+    name: /var/grafana 
+    state: directory 
+    owner: 472 
+    mode: 0755
 
 - name: Ensure docker container is running
   docker_container:

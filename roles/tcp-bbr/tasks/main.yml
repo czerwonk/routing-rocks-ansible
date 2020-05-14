@@ -1,5 +1,3 @@
----
-
 - name: Get kernel version
   shell: uname -r
   register: kernel_version
@@ -10,7 +8,11 @@
   ignore_errors: yes
 
 - name: Ensure sysctl is configured
-  copy: src=90-bbr.conf dest=/etc/sysctl.d/90-bbr.conf mode=0644 owner=root
+  copy: 
+    src: 90-bbr.conf 
+    dest: /etc/sysctl.d/90-bbr.conf 
+    mode: 0400 
+    owner: root
   notify: Reload sysctl
   when: bbr_support | succeeded
 

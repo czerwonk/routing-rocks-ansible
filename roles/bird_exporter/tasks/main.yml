@@ -1,4 +1,3 @@
----
 
 - name: Ensure bird_exporter is installed
   environment:
@@ -7,15 +6,18 @@
   notify: Restart bird_exporter
 
 - name: Ensure service is configured
-  copy: src=bird_exporter.service dest=/lib/systemd/system/bird_exporter.service
+  copy: 
+    src: bird_exporter.service 
+    dest: /lib/systemd/system/bird_exporter.service
   register: service_unit
 
 - name: Reload systemd
-  systemd: daemon_reload=yes
+  systemd: 
+    daemon_reload: yes
   when: service_unit.changed
 
-- name: Ensure service is enabled
-  service: name=bird_exporter enabled=yes
-
-- name: Ensure service is started
-  service: name=bird_exporter state=started
+- name: Ensure service is enabled and started
+  service: 
+    name: bird_exporter 
+    enabled: yes
+    state: started

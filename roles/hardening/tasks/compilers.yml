@@ -1,0 +1,20 @@
+- name: Ensure compilers are uninstalled
+  dnf:
+    name:
+    - cmake
+    - make
+    - golang
+    - automake
+    - autoconf
+    - g++
+    - g++-9
+    - gcc
+    - gcc-9
+    - clang
+    state: absent
+
+- name: Ensure compilers required by other packages are not world accessible
+  file:
+    path: /usr/bin/as
+    mode: 0700
+    owner: root

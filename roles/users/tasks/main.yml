@@ -1,17 +1,18 @@
----
-
 - name: Create groups
   group: name={{ item }} state=present
   with_items: "{{ user_groups }}"
 
 - name: Create user account
-  user: name={{ user.name }} 
-        groups={{ user.groups | join(",") }} 
-        createhome=yes 
-        shell={{ user.shell }}
-        comment={{ user.comment }}
-        home=/home/{{ user.name }}
+  user: 
+    name: "{{ user.name }}"
+    groups: "{{ user.groups | join(",") }}" 
+    createhome: yes
+    shell: "{{ user.shell }}"
+    comment: "{{ user.comment }}"
+    home: "/home/{{ user.name }}"
 
 - name: Set authorized_keys
-  authorized_key: user={{ user.name }} key={{ item }}
+  authorized_key: 
+    user: "{{ user.name }}" 
+    key: "{{ item }}"
   with_items: "{{ user.ssh_keys }}"

@@ -1,0 +1,27 @@
+- name: Blacklist unused kernel modules
+  copy:
+    content: "install {{ item }} /bin/true"
+    dest: /etc/modprobe.d/{{ item }}.conf
+  with_items:
+  - usb-storage
+  - firewire-core
+  - dccp
+  - sctp
+  - rds
+  - tipc
+  - cramfs
+  - freevxfs
+  - hfs
+  - hfsplus
+  - jffs2
+  - udf
+  - squashfs
+
+- name: Ensure hardened default kernel parameters are configured
+  copy:
+    src: sysctl.conf
+    dest: /etc/sysctl.d/98-hardening.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: Reload sysctl

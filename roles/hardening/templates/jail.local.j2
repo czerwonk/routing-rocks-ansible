@@ -1,0 +1,11 @@
+[DEFAULT]
+bantime   = 1h
+maxretry  = 5
+backend   = systemd
+banaction = iptables-new
+ignoreip  = 127.0.0.1/8 ::1 {{ fail2ban.ignoreip | default('') }}
+
+[sshd]
+enabled = true
+enabled = true
+port    = {{ sshd_port | default('ssh') }}

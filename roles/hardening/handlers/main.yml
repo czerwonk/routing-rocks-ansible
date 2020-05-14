@@ -1,0 +1,12 @@
+- name: Restart fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+
+- name: Reload sysctl
+  shell: sysctl --system
+
+- name: Restart auditd
+  systemd:
+    name: auditd
+    state: restarted

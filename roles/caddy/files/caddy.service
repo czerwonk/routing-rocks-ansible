@@ -1,10 +1,29 @@
 [Unit]
-Description=caddywebserver
+Description=Caddy Webserver
 
 [Service]
 User=daemon
 ExecStart=/usr/local/bin/caddy -conf /etc/caddy/Caddyfile -agree
-Environment=CADDYPATH=/etc/ssl/caddy
+Restart=on-failure
+Environment=CADDYPATH=/var/caddy
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+LimitNOFILE=8192
+PrivateDevices=true
+PrivateTmp=yes
+ProtectControlGroups=true
+ProtectKernelModules=yes
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectClock=true
+ProtectHostname=true
+ProtectHome=true
+DevicePolicy=closed
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
 
 [Install]
 WantedBy=default.target

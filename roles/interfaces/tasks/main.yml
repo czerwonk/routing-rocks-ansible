@@ -1,14 +1,26 @@
 ---
 
 - name: Ensure post-up script exists
-  copy: src=ifup-local dest=/sbin/ifup-local mode=0755 owner=root
+  copy: 
+    src: ifup-local 
+    dest: /sbin/ifup-local 
+    mode: 0755 
+    owner: root
 
 - name: Ensure loopback is configured
-  template: src=ifcfg-lo.j2 dest=/etc/sysconfig/network-scripts/ifcfg-lo mode=0644 owner=root
+  template: 
+    src: ifcfg-lo.j2 
+    dest: /etc/sysconfig/network-scripts/ifcfg-lo 
+    mode: 0600 
+    owner: root
   notify: Restart network
 
 - name: Ensure ethernet interfaces are configured
-  template: src=ifcfg-eth.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  template: 
+    src: ifcfg-eth.j2 
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
+    mode: 0600 
+    owner: root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
@@ -16,7 +28,11 @@
   notify: Restart network
 
 - name: Ensure vlan interfaces are configured
-  template: src=ifcfg-vlan.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  template: 
+    src: ifcfg-vlan.j2 
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}"
+    mode: 0600 
+    owner: root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
@@ -24,7 +40,11 @@
   notify: Restart network
 
 - name: Ensure tunnel interfaces are configured
-  template: src=ifcfg-tunnel.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+  template: 
+    src: ifcfg-tunnel.j2 
+    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
+    mode: 0600 
+    owner: root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
@@ -32,17 +52,27 @@
   notify: Restart network
 
 - name: Ensure post-up scripts exist
-  template: src=postup-lo.j2 dest=/etc/sysconfig/network-scripts/postup-lo mode=0744 owner=root
+  template: 
+    src: postup-lo.j2 
+    dest: /etc/sysconfig/network-scripts/postup-lo
+    mode: 0700 
+    owner: root
   notify: Restart network
 
 - name: Ensure post-up scripts exist
-  template: src=postup.j2 dest=/etc/sysconfig/network-scripts/postup-{{ iface.name }} mode=0744 owner=root
+  template: 
+    src: postup.j2 
+    dest: "/etc/sysconfig/network-scripts/postup-{{ iface.name }}"
+    mode: 0700 
+    owner: root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
   notify: Restart network
  
-- template: src=ifcfg-sit.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+- template: src=ifcfg-sit.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0600 owner=root
+    mode: 0700 
+    owner: root
   with_items: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
@@ -51,7 +81,11 @@
 
 - block:
   - name: Ensure bonding interfaces are configured
-    template: src=ifcfg-bond.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0644 owner=root
+    template: 
+      src: ifcfg-bond.j2 
+      dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
+      mode: 0600 
+      owner: root
     with_items: "{{ interfaces }}"
     loop_control:
       loop_var: "iface"
@@ -59,6 +93,10 @@
     notify: Restart network
 
   - name: Ensure bonding module is enabled
-    copy: dest=/etc/modules-load.d/bonding.conf content="bonding" mode=0644 owner=root
+    copy: 
+      dest: /etc/modules-load.d/bonding.conf 
+      content: "bonding" 
+      mode: 0600 
+      owner: root
 
   when: use_bonding | default(false)

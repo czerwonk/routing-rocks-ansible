@@ -1,12 +1,17 @@
-- name: Ensure plugins core package is installed
-  dnf: name=dnf-plugins-core state=present
-
-- name: Ensure repo is enabled
-  shell: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-
 - name: Ensure docker is installed
-  dnf: name=docker-ce,docker-ce-cli,containerd.io state=present
+  dnf: 
+    name: 
+    - moby-engine 
+    state: present
+
+- name: Ensure docker is configured
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
 
 - name: Ensure docker daemon is enabled and running
-  service: name=docker state=started enabled=yes
+  service: 
+    name: docker 
+    state: started
+    enabled: yes
   

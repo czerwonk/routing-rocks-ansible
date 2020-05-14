@@ -1,0 +1,13 @@
+- name: Ensure core dumps are disabled (profile)
+  copy:
+    content: "#!/bin/sh\nulimit -c 0"
+    dest: /etc/profile.d/disable-coredumps.sh
+    owner: root
+    mode: 0644
+
+- name: Ensure core dumps are disabled (limits)
+  copy:
+    content: "* hard core 0"
+    dest: /etc/security/limits.d/disable-coredumps
+    owner: root
+    mode: 0644

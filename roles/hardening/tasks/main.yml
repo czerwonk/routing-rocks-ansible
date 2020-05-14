@@ -1,0 +1,27 @@
+- name: Ensure hosts file is correct
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+
+- name: Ensure legal banner exists
+  template:
+    src: issue.j2
+    dest: /etc/issue
+
+- name: Ensure issue.net does not exist
+  file:
+    path: /etc/issue.net
+    state: absent
+
+- include: updates.yml
+
+- include: tools.yml
+
+- include: file-permissions.yml
+
+- include: coredump.yml
+
+- include: kernel.yml
+
+- include: compilers.yml
+
