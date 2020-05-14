@@ -1,2 +1,4 @@
-127.0.0.1   localhost localhost4 {{ inventory_hostname }}
-::1         localhost localhost6 {{ inventory_hostname }}
+127.0.0.1                 localhost localhost4 
+{{ source_ipv4 }}         {{ inventory_hostname }}
+::1                       localhost localhost6
+{{ source_ipv6 }}         {{ inventory_hostname }}

@@ -26,8 +26,9 @@
 
 - name: Ensure system is enabled
   copy:
-    content: "ENABLED=\"true\""
+    content: 'ENABLED=”true”'
     dest: /etc/default/sysstat
+  notify: Restart sysstat
 
 - name: Ensure sysstat daemon is enabled
   systemd:

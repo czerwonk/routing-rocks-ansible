@@ -10,3 +10,8 @@
   systemd:
     name: auditd
     state: restarted
+
+- name: Restart sysstat 
+  systemd:
+    name: sysstat
+    state: restarted

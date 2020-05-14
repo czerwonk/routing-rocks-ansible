@@ -8,6 +8,8 @@
   - /etc/crontab
   - /boot/grub2/grub.cfg
   - /etc/ssh/sshd_config
+  - /etc/at.deny
+  - /etc/cron.deny
 
 - name: Ensure root .ssh dir is not accessible
   file:
@@ -32,5 +34,3 @@
   - cron.hourly
   - cron.weekly
   - cron.monthly
-  - at.deny
-  - cron.deny
