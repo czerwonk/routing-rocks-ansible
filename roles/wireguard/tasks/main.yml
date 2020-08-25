@@ -10,7 +10,10 @@
     - wireguard-tools
 
 - name: Ensure config dir exists
-  file: path=/etc/wireguard state=directory owner=root
+  file: 
+    path: /etc/wireguard
+    state: directory
+    owner: root
   register: config_dir
 
 - name: Generate keys
@@ -18,7 +21,10 @@
   when: config_dir.changed
 
 - name: Ensure file permissions are set correctly
-  file: path=/etc/wireguard/privatekey mode=0400 state=file
+  file: 
+    path: /etc/wireguard/privatekey
+    mode: 0400
+    state: file
 
 - name: Configure interfaces
   include_tasks: wg_interface.yml
