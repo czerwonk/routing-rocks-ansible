@@ -70,8 +70,10 @@
     loop_var: "iface"
   notify: Restart network
  
-- template: src=ifcfg-sit.j2 dest=/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} mode=0600 owner=root
-    mode: 0700 
+- template: 
+    src: ifcfg-sit.j2 
+    dest: /etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} 
+    mode: 0600 
     owner: root
   with_items: "{{ interfaces }}"
   loop_control:
