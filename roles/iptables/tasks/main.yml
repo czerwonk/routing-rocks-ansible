@@ -6,7 +6,7 @@
 - name: Ensure iptables is configured
   template: 
     src: iptables.rules.j2 
-    dest: /etc/sysconfig/iptables.rules 
+    dest: /etc/sysconfig/iptables 
     mode: 0600 
     owner: root
   notify: Reload iptables
@@ -14,13 +14,16 @@
 - name: Ensure ip6tables is configured
   template: 
     src: ip6tables.rules.j2 
-    dest: /etc/sysconfig/ip6tables.rules 
+    dest: /etc/sysconfig/ip6tables 
     mode: 0600 
     owner: root
   notify: Reload ip6tables
 
 - name: Ensure iptables is enabled and started
   systemd:
-    name: iptables
+    name: "{{ item }}"
     enabled: yes
     state: started
+  with_items:
+  - iptables
+  - ip6tables
