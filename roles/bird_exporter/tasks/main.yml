@@ -1,8 +1,9 @@
 
 - name: Ensure bird_exporter is installed
-  environment:
-    GOPATH: /usr/local
-  shell: go get -u github.com/czerwonk/bird_exporter
+  unarchive:
+    src: https://github.com/czerwonk/bird_exporter/releases/download/{{ bird_exporter_version }}/bird_exporter_{{ bird_exporter_version }}_linux_amd64.tar.gz
+    dest: /usr/local/bin/
+    remote_src: yes
   notify: Restart bird_exporter
 
 - name: Ensure service is configured
