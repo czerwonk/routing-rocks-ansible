@@ -1,4 +1,4 @@
 [submodule "roles/routing-policy"]
   path = roles/routing-policy
   url = https://github.com/czerwonk/routing-rocks-policy-role.git
-  tag = 2.1.4
+  tag = 2.1.5
