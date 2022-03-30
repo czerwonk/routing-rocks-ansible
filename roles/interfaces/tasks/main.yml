@@ -1,104 +1,40 @@
----
-
-- name: Ensure post-up script exists
-  copy: 
-    src: ifup-local 
-    dest: /sbin/ifup-local 
-    mode: 0755 
-    owner: root
-
 - name: Ensure loopback is configured
   template: 
-    src: ifcfg-lo.j2 
-    dest: /etc/sysconfig/network-scripts/ifcfg-lo 
-    mode: 0600 
+    src: loopback.network.j2 
+    dest: /etc/systemd/network/10-loopback.network 
+    mode: 0444 
     owner: root
   notify: Restart network
 
-- name: Ensure ethernet interfaces are configured
+- name: Ensure physical interfaces are configured 
   template: 
-    src: ifcfg-eth.j2 
-    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
-    mode: 0600 
+    src: network.j2 
+    dest: "/etc/systemd/network/20-{{ iface.name }}.network" 
+    mode: 0444 
     owner: root
-  with_items: "{{ interfaces }}"
-  loop_control:
-    loop_var: "iface"
-  when: iface.type == 'Ethernet'
-  notify: Restart network
-
-- name: Ensure vlan interfaces are configured
-  template: 
-    src: ifcfg-vlan.j2 
-    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}"
-    mode: 0600 
-    owner: root
-  with_items: "{{ interfaces }}"
-  loop_control:
-    loop_var: "iface"
-  when: iface.type == 'VLAN'
-  notify: Restart network
-
-- name: Ensure tunnel interfaces are configured
-  template: 
-    src: ifcfg-tunnel.j2 
-    dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
-    mode: 0600 
-    owner: root
-  with_items: "{{ interfaces }}"
-  loop_control:
-    loop_var: "iface"
-  when: iface.type == 'Tunnel'
-  notify: Restart network
-
-- name: Ensure post-up scripts exist
-  template: 
-    src: postup-lo.j2 
-    dest: /etc/sysconfig/network-scripts/postup-lo
-    mode: 0700 
-    owner: root
-  notify: Restart network
-
-- name: Ensure post-up scripts exist
-  template: 
-    src: postup.j2 
-    dest: "/etc/sysconfig/network-scripts/postup-{{ iface.name }}"
-    mode: 0700 
-    owner: root
-  with_items: "{{ interfaces }}"
+  loop: "{{ interfaces }}"
   loop_control:
     loop_var: "iface"
   notify: Restart network
- 
+
+- name: Ensure VLAN interfaces are configured 
+  template: 
+    src: vlan.j2 
+    dest: "/etc/systemd/network/20-{{ item[1].name }}.netdev" 
+    mode: 0444 
+    owner: root
+  vars:
+    iface: "{{ item[1] }}"
+  loop: "{{ interfaces | subelements('vlans') }}"
+  notify: Restart network
+
 - template: 
-    src: ifcfg-sit.j2 
-    dest: /etc/sysconfig/network-scripts/ifcfg-{{ iface.name }} 
-    mode: 0600 
+    src: network.j2 
+    dest: "/etc/systemd/network/30-{{ item[1].name }}.network" 
+    mode: 0444 
     owner: root
-  with_items: "{{ interfaces }}"
-  loop_control:
-    loop_var: "iface"
-  when: iface.type == 'SIT'
+  vars:
+    iface: "{{ item[1] }}"
+    is_vlan: true
+  loop: "{{ interfaces | subelements('vlans') }}"
   notify: Restart network
-
-- block:
-  - name: Ensure bonding interfaces are configured
-    template: 
-      src: ifcfg-bond.j2 
-      dest: "/etc/sysconfig/network-scripts/ifcfg-{{ iface.name }}" 
-      mode: 0600 
-      owner: root
-    with_items: "{{ interfaces }}"
-    loop_control:
-      loop_var: "iface"
-    when: iface.type == 'Bond'
-    notify: Restart network
-
-  - name: Ensure bonding module is enabled
-    copy: 
-      dest: /etc/modules-load.d/bonding.conf 
-      content: "bonding" 
-      mode: 0600 
-      owner: root
-
-  when: use_bonding | default(false)

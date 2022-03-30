@@ -1,7 +1,0 @@
-#!/bin/sh
-{% for vrf in vrfs | default([]) %}
-ip link add {{ vrf.name }} type vrf table {{ vrf.table }}
-ip rule add iif {{ vrf.name }} table {{ vrf.table }}
-ip rule add oif {{ vrf.name }} table {{ vrf.table }}
-ip link set dev {{ vrf.name }} up
-{% endfor %}

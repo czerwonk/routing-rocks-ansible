@@ -1,0 +1,15 @@
+[Match]
+Name=lo
+Type=loopback
+
+{% if loopback.ipv4 is defined %}
+[Address]
+Address={{ loopback.ipv4.address | replace('/32', '') }}/32
+Scope=host
+
+{% endif %}
+{% if loopback.ipv4 is defined %}
+[Address]
+Address={{ loopback.ipv6.address | replace('/128', '') }}/128
+Scope=host
+{% endif %}

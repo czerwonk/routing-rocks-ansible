@@ -1,0 +1,40 @@
+[Match]
+Name={{ iface.name }}
+{% if is_vlan | default(false) %}
+Type=vlan
+{% else %}
+Type=ether
+{% endif %}
+
+[Network]
+{% if iface.forwarding | default(true) %}
+IPForward=true
+{% else %}
+IPForward=false
+{% endif %}
+{% for vlan in iface.vlans | default('') %}
+VLAN={{ vlan.name }}
+{% endfor %}
+LinkLocalAddressing=no
+IPv6AcceptRA=no
+IPv6SendRA=no
+{% if not is_vlan | default(false) %}
+LLDP=yes
+EmitLLDP=yes
+{% endif %}
+
+{% if iface.ipv4 is defined %}
+[Address]
+Address={{ iface.ipv4.address }}
+
+{% endif %}
+{% if iface.ipv6 is defined %}
+[Address]
+Address={{ iface.ipv6.address }}
+
+{% endif %}
+{% if iface.ipv4 is defined and iface.ipv4.gateway is defined %}
+
+[Route]
+Gateway={{ iface.ipv4.gateway }}
+{% endif %}

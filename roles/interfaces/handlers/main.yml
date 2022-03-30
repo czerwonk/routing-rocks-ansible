@@ -1,4 +1,6 @@
 ---
 
 - name: Restart network
-  service: name=network state=restarted
+  systemd:
+    name: systemd-networkd
+    state: reloaded
