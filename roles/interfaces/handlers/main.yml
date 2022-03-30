@@ -4,3 +4,7 @@
   systemd:
     name: systemd-networkd
     state: reloaded
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes

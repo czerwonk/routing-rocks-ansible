@@ -17,6 +17,17 @@
     loop_var: "iface"
   notify: Restart network
 
+- template: 
+    src: service.j2 
+    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service" 
+    mode: 0444 
+    owner: root
+  loop_control:
+    loop_var: "iface"
+  loop: "{{ interfaces }}"
+  when: item.post_up is defined
+  notify: Reload systemd
+
 - name: Ensure VLAN interfaces are configured 
   template: 
     src: vlan.j2 
@@ -38,3 +49,14 @@
     is_vlan: true
   loop: "{{ interfaces | subelements('vlans') }}"
   notify: Restart network
+
+- template: 
+    src: service.j2 
+    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service" 
+    mode: 0444 
+    owner: root
+  vars:
+    iface: "{{ item[1] }}"
+  loop: "{{ interfaces | subelements('vlans') }}"
+  when: item[1].post_up is defined
+  notify: Reload systemd
