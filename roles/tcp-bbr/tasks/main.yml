@@ -1,12 +1,3 @@
-- name: Get kernel version
-  shell: uname -r
-  register: kernel_version
-
-- name: Check for bbr support
-  shell: egrep "CONFIG_TCP_CONG_BBR=(m|y)" /boot/config-{{ kernel_version.stdout }}
-  register: bbr_support
-  ignore_errors: yes
-
 - name: Ensure sysctl is configured
   copy: 
     src: 90-bbr.conf 
@@ -14,5 +5,4 @@
     mode: 0400 
     owner: root
   notify: Reload sysctl
-  when: bbr_support | succeeded
 
