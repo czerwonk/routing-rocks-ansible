@@ -1,13 +1,7 @@
----
-
-- name: Ensure repo is enabled
-  shell: dnf -y copr enable jdoss/wireguard
-
 - name: Ensure wireguard is installed
-  dnf: name={{ item }} state=installed
-  with_items:
-    - wireguard-dkms 
-    - wireguard-tools
+  dnf: 
+    name: wireguard-tools
+    state: present
 
 - name: Ensure config dir exists
   file: 
