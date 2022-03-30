@@ -8,7 +8,6 @@
   - forwarding
   - iptables
   - routinator
-  - routing-install
   - routing-policy
   - node_exporter
   - bird_exporter

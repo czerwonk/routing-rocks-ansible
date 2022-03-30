@@ -1,8 +1,5 @@
 ---
 
-- name: Ensure forwarding is configured
-  copy: src=network dest=/etc/sysconfig/network mode=0644 owner=root
-
 - name: Ensure sysctl is configured
   copy: src=99-routing-rocks.conf dest=/etc/sysctl.d/99-routing-rocks.conf mode=0644 owner=root
   notify: Reload sysctl

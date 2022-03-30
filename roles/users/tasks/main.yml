@@ -5,7 +5,7 @@
 - name: Create user account
   user: 
     name: "{{ user.name }}"
-    groups: "{{ user.groups | join(",") }}" 
+    groups: "{{ user.groups | join(',') }}" 
     createhome: yes
     shell: "{{ user.shell }}"
     comment: "{{ user.comment }}"
