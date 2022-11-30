@@ -1,0 +1,38 @@
+[color]
+	ui = auto
+	interactive = auto
+[user]
+	name = Daniel Czerwonk
+	email = daniel@routing.rocks 
+[core]
+	quotepath = false
+	editor = vim
+	autocrlf = false
+	excludesfile = ~/.gitignore_global
+[merge]
+  tool = splice
+[mergetool "splice"]
+  cmd = "vim -f $BASE $LOCAL $REMOTE $MERGED -c 'SpliceInit'"
+  trustExitCode = true
+[branch]
+	autosetuprebase = always
+[push]
+	default = simple
+[apply]
+	whitespace = nowarn
+[alias]
+	graph = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(cyan)<%an>%Creset' --abbrev-commit --date=relative
+	co = checkout
+	br = branch
+	c = commit
+	st = status
+	rb = rebase
+	ls = ls-files
+  pu = push
+  p = pull
+  f = fetch
+	ignores = ls-files -o -i --exclude-standard
+[diff]
+	tool = vimdiff
+[difftool]
+  prompt = false

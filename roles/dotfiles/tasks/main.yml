@@ -1,0 +1,2 @@
+- include: copy.yml user="root" dir="/root"
+- include: copy.yml user="daniel" dir="/home/daniel"

@@ -1,0 +1,8 @@
+[Service]
+Type=oneshot
+{% for cmd in iface.post_up %}
+ExecStart=/bin/bash -c "{{ cmd }}"
+{% endfor %}
+
+[Install]
+WantedBy=sys-subsystem-net-devices-{{ iface.name }}.device
