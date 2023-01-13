@@ -43,7 +43,7 @@ COMMIT
 {% endif %}
 {% endfor %}
 {% for peer in peerings | default([]) %}
-{% for session in peer.sessions %}
+{% for session in peer.sessions | default([]) %}
 {% if session.ip | ipv4() != False %}
 -A INPUT -s {{ session.ip }}{% if session.interface is defined %} -i {{ session.interface }}{% endif %} -p tcp -m tcp --dport 179 -j ACCEPT
 -A INPUT -s {{ session.ip }}{% if session.interface is defined %} -i {{ session.interface }}{% endif %} -p tcp -m tcp --sport 179 -j ACCEPT
@@ -62,7 +62,7 @@ COMMIT
 {% endfor %}
 -A INPUT -p udp -m udp --dport 1194 -j ACCEPT
 -A INPUT -p udp -m udp --dport 60001:60999 -j ACCEPT
-{% for iface in wireguard.interfaces %}
+{% for iface in wireguard.interfaces | default([]) %}
 {% if iface.port is defined %}
 -A INPUT -p udp -m udp --dport {{ iface.port }} -j ACCEPT
 {% endif %}
