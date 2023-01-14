@@ -2,6 +2,7 @@
 - hosts: routers
   roles:
   - packages
+  - docker
   - users
   - ssh
   - interfaces
