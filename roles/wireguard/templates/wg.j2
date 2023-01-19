@@ -25,6 +25,9 @@ PrivateKey = {{ wireguard_host.private_key }}
 {% for cmd in iface.post_up | default([]) %}
 PostUp = {{ cmd }}
 {% endfor %}
+{% if iface.mtu is defined %}
+MTU = {{ iface.mtu }}
+{% endif %}
 
 [Peer]
 PublicKey = {{ iface.peer }}
