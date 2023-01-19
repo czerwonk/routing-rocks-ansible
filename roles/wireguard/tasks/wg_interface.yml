@@ -6,7 +6,6 @@
     mode: 0600
 
 - name: Ensure service is enabled and started
-  service: name=wg-quick@{{ iface.name }} enabled=yes
   systemd:
     name: "wg-quick@{{ iface.name }}"
     enabled: yes
