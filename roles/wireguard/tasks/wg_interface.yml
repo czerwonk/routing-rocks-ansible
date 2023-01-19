@@ -1,12 +1,13 @@
----
-
 - name: Configure {{ item.name }}
-  template: src=wg.j2 dest=/etc/wireguard/{{ iface.name }}.conf owner=root mode=0600
-  register: wg_service
+  template: 
+    src: wg.j2 
+    dest: "/etc/wireguard/{{ iface.name }}.conf"
+    owner: root 
+    mode: 0600
 
-- name: Ensure service is enabled
+- name: Ensure service is enabled and started
   service: name=wg-quick@{{ iface.name }} enabled=yes
-
-- name: Ensure service is started
-  service: name=wg-quick@{{ iface.name }} state=restarted
-  when: wg_service.changed
+  systemd:
+    name: "wg-quick@{{ iface.name }}"
+    enabled: yes
+    state: started
