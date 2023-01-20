@@ -15,7 +15,6 @@ IPForward=false
 {% for vlan in iface.vlans | default('') %}
 VLAN={{ vlan.name }}
 {% endfor %}
-LinkLocalAddressing=no
 IPv6AcceptRA=no
 IPv6SendRA=no
 {% if not is_vlan | default(false) %}
