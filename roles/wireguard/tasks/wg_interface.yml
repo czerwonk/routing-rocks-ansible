@@ -1,5 +1,5 @@
 - name: Configure {{ item.name }}
-  ansible.builtin.template: 
+  ansible.builtin.template:
     src: wg.j2 
     dest: "/etc/wireguard/{{ iface.name }}.conf"
     owner: root 

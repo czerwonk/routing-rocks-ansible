@@ -1,6 +1,6 @@
 - name: Ensure newest version of node exporter is installed
   ansible.builtin.shell: "{{ go_path }}/go get github.com/prometheus/node_exporter"
-  environment: 
+  environment:
     GOPATH: /usr/local
 
 - name: Create systemd unit

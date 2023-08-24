@@ -1,5 +1,5 @@
 - name: Ensure docker is installed
-  ansible.builtin.dnf: 
+  ansible.builtin.dnf:
     name: moby-engine 
     state: present
 
@@ -23,7 +23,7 @@
     mode: 0400
 
 - name: Ensure docker daemon is enabled and running
-  ansible.builtin.systemd: 
+  ansible.builtin.systemd:
     name: docker 
     state: started
     enabled: yes

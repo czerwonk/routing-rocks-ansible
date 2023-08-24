@@ -4,7 +4,7 @@
   with_items: "{{ user_groups }}"
 
 - name: Create user account
-  ansible.builtin.user: 
+  ansible.builtin.user:
     name: "{{ user.name }}"
     groups: "{{ user.groups | join(',') }}" 
     createhome: yes
@@ -13,7 +13,7 @@
     home: "/home/{{ user.name }}"
 
 - name: Set authorized_keys
-  ansible.builtin.authorized_key: 
+  ansible.builtin.authorized_key:
     user: "{{ user.name }}" 
     key: "{{ item }}"
   with_items: "{{ user.ssh_keys }}"

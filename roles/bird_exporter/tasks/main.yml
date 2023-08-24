@@ -7,18 +7,18 @@
   notify: Restart bird_exporter
 
 - name: Ensure service is configured
-  ansible.builtin.copy: 
+  ansible.builtin.copy:
     src: bird_exporter.service 
     dest: /lib/systemd/system/bird_exporter.service
   register: service_unit
 
 - name: Reload systemd
-  ansible.builtin.systemd: 
+  ansible.builtin.systemd:
     daemon_reload: yes
   when: service_unit.changed
 
 - name: Ensure service is enabled and started
-  ansible.builtin.service: 
+  ansible.builtin.service:
     name: bird_exporter 
     enabled: yes
     state: started

@@ -12,21 +12,21 @@
     system: yes
 
 - name: Ensure caddy config directory exists
-  ansible.builtin.file: 
+  ansible.builtin.file:
     path: /etc/caddy 
     owner: caddy 
     mode: 0500 
     state: directory 
 
 - name: Ensure CADDYPATH directory exists
-  ansible.builtin.file: 
+  ansible.builtin.file:
     path: /var/caddy 
     owner: caddy 
     mode: 0700 
     state: directory 
 
 - name: Ensure caddy is configured 
-  ansible.builtin.template: 
+  ansible.builtin.template:
     src: Caddyfile.j2 
     dest: /etc/caddy/Caddyfile 
     owner: caddy 
@@ -34,7 +34,7 @@
   notify: Restart caddy
 
 - name: Ensure service unit exists
-  ansible.builtin.copy: 
+  ansible.builtin.copy:
     src: caddy.service
     dest: /lib/systemd/system/caddy.service
     mode: 0644
@@ -43,6 +43,6 @@
   notify: Restart caddy
 
 - name: Reload systemd
-  ansible.builtin.systemd: 
+  ansible.builtin.systemd:
     daemon_reload: yes
   when: systemd.changed

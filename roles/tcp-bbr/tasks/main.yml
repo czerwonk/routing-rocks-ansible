@@ -1,5 +1,5 @@
 - name: Ensure sysctl is configured
-  ansible.builtin.copy: 
+  ansible.builtin.copy:
     src: 90-bbr.conf 
     dest: /etc/sysctl.d/90-bbr.conf 
     mode: 0400 

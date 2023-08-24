@@ -1,10 +1,10 @@
 - name: Ensure wireguard is installed
-  ansible.builtin.dnf: 
+  ansible.builtin.dnf:
     name: wireguard-tools
     state: present
 
 - name: Ensure config dir exists
-  ansible.builtin.file: 
+  ansible.builtin.file:
     path: /etc/wireguard
     state: directory
     owner: root
@@ -15,7 +15,7 @@
   when: config_dir.changed
 
 - name: Ensure file permissions are set correctly
-  ansible.builtin.file: 
+  ansible.builtin.file:
     path: /etc/wireguard/privatekey
     mode: 0400
     state: file

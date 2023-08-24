@@ -1,10 +1,10 @@
 - name: Ensure iptables is installed
-  ansible.builtin.dnf: 
+  ansible.builtin.dnf:
     name: iptables-services
     state: present
 
 - name: Ensure iptables is configured
-  ansible.builtin.template: 
+  ansible.builtin.template:
     src: iptables.rules.j2 
     dest: /etc/sysconfig/iptables 
     mode: 0600 
@@ -12,7 +12,7 @@
   notify: Reload iptables
 
 - name: Ensure ip6tables is configured
-  ansible.builtin.template: 
+  ansible.builtin.template:
     src: ip6tables.rules.j2 
     dest: /etc/sysconfig/ip6tables 
     mode: 0600 
