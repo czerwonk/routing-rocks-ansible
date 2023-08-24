@@ -3,4 +3,4 @@
     src: service.j2
     dest: /etc/systemd/system/post-up-{{ iface.name }}.service
     owner: root
-    mode: 0444
+    mode: '444'

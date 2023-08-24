@@ -16,5 +16,5 @@
 - name: Ensure compilers required by other packages are not world accessible
   ansible.builtin.file:
     path: /usr/bin/as
-    mode: 0700
+    mode: '700'
     owner: root

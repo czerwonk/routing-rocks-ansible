@@ -6,7 +6,7 @@
   ansible.builtin.file:
     path: /var/kea
     state: directory
-    mode: 0755
+    mode: '755'
     owner: root
 
 - name: Ensure config is up to date
@@ -14,7 +14,7 @@
     src: kea.conf.j2
     dest: /etc/kea/kea-dhcp4.conf
     owner: root
-    mode: 0644
+    mode: '644'
   notify: Restart kea
 
 - name: Ensure service is enabled and running

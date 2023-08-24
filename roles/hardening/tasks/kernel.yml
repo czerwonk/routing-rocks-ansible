@@ -21,7 +21,7 @@
   ansible.builtin.copy:
     src: sysctl.conf
     dest: /etc/sysctl.d/98-hardening.conf
-    mode: 0644
+    mode: '644'
     owner: root
     group: root
   notify: Reload sysctl

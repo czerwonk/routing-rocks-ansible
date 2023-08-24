@@ -11,7 +11,7 @@
 - name: Ensure docker directory exists
   ansible.builtin.file:
     path: /etc/docker/
-    mode: 0500
+    mode: '500'
     owner: root
     state: directory
 
@@ -20,7 +20,7 @@
     src: daemon.json
     dest: /etc/docker/daemon.json
     owner: root
-    mode: 0400
+    mode: '400'
 
 - name: Ensure docker daemon is enabled and running
   ansible.builtin.systemd:

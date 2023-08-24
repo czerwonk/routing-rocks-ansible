@@ -2,7 +2,7 @@
   ansible.builtin.copy:
     src: 90-bbr.conf 
     dest: /etc/sysctl.d/90-bbr.conf 
-    mode: 0400 
+    mode: '400' 
     owner: root
   notify: Reload sysctl
 

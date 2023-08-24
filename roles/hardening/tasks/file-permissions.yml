@@ -3,7 +3,7 @@
     path: "{{ item }}"
     owner: root
     group: root
-    mode: 0600
+    mode: '600'
   with_items:
     - /etc/crontab
     - /boot/grub2/grub.cfg
@@ -16,7 +16,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0700
+    mode: '700'
 
 - name: Ensure home dirs are not accessible by world
   ansible.builtin.shell: find /home/* -maxdepth 0 -type d | xargs -I {} chmod 750 {}
@@ -26,7 +26,7 @@
     path: "/etc/{{ item }}"
     state: directory
     owner: root
-    mode: 0700
+    mode: '700'
   with_items:
     - cron.d
     - cron.daily

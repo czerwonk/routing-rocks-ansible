@@ -21,7 +21,7 @@
     dest: /etc/audit/rules.d/log-root.rules
     owner: root
     group: root
-    mode: 0600
+    mode: '600'
   notify: Restart auditd
 
 - name: Ensure system is enabled

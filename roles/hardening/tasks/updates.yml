@@ -8,7 +8,7 @@
     src: dnf-automatic.conf
     dest: /etc/dnf/automatic.conf
     owner: root
-    mode: 0600
+    mode: '600'
 
 - name: Ensure dnf-automatic is enabled and running
   ansible.builtin.systemd:

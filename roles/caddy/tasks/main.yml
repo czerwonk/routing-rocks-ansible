@@ -15,14 +15,14 @@
   ansible.builtin.file:
     path: /etc/caddy 
     owner: caddy 
-    mode: 0500 
+    mode: '500' 
     state: directory 
 
 - name: Ensure CADDYPATH directory exists
   ansible.builtin.file:
     path: /var/caddy 
     owner: caddy 
-    mode: 0700 
+    mode: '700' 
     state: directory 
 
 - name: Ensure caddy is configured 
@@ -30,14 +30,14 @@
     src: Caddyfile.j2 
     dest: /etc/caddy/Caddyfile 
     owner: caddy 
-    mode: 0400
+    mode: '400'
   notify: Restart caddy
 
 - name: Ensure service unit exists
   ansible.builtin.copy:
     src: caddy.service
     dest: /lib/systemd/system/caddy.service
-    mode: 0644
+    mode: '644'
     owner: root
   register: systemd
   notify: Restart caddy
