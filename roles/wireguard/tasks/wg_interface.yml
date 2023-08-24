@@ -8,5 +8,5 @@
 - name: Ensure service is enabled and started
   ansible.builtin.systemd:
     name: "wg-quick@{{ iface.name }}"
-    enabled: yes
+    enabled: true
     state: started

@@ -21,4 +21,4 @@
   ansible.builtin.systemd:
     name: kea-dhcp4
     state: started
-    enabled: yes
+    enabled: true

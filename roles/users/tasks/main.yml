@@ -7,7 +7,7 @@
   ansible.builtin.user:
     name: "{{ user.name }}"
     groups: "{{ user.groups | join(',') }}" 
-    createhome: yes
+    createhome: true
     shell: "{{ user.shell }}"
     comment: "{{ user.comment }}"
     home: "/home/{{ user.name }}"

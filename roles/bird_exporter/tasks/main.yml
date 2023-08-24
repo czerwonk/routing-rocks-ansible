@@ -3,7 +3,7 @@
   ansible.builtin.unarchive:
     src: https://github.com/czerwonk/bird_exporter/releases/download/{{ bird_exporter_version }}/bird_exporter_{{ bird_exporter_version }}_linux_amd64.tar.gz
     dest: /usr/local/bin/
-    remote_src: yes
+    remote_src: true
   notify: Restart bird_exporter
 
 - name: Ensure service is configured
@@ -14,11 +14,11 @@
 
 - name: Reload systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when: service_unit.changed
 
 - name: Ensure service is enabled and started
   ansible.builtin.service:
     name: bird_exporter 
-    enabled: yes
+    enabled: true
     state: started

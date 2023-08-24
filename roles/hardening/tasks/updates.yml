@@ -13,4 +13,4 @@
 - name: Ensure dnf-automatic is enabled and running
   ansible.builtin.systemd:
     name: dnf-automatic.timer
-    enabled: yes
+    enabled: true

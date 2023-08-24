@@ -11,11 +11,11 @@
 
 - name: Reload systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when: systemd_unit.changed
 
 - name: Ensure service is enabled and started
   ansible.builtin.systemd:
     name: node_exporter
     state: started
-    enabled: yes
+    enabled: true

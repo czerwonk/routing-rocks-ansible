@@ -9,7 +9,7 @@
 - name: Ensure caddy user exists
   ansible.builtin.user:
     name: caddy
-    system: yes
+    system: true
 
 - name: Ensure caddy config directory exists
   ansible.builtin.file:
@@ -44,5 +44,5 @@
 
 - name: Reload systemd
   ansible.builtin.systemd:
-    daemon_reload: yes
+    daemon_reload: true
   when: systemd.changed

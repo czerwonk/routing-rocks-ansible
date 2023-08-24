@@ -22,7 +22,7 @@
 - name: Ensure iptables is enabled and started
   ansible.builtin.systemd:
     name: "{{ item }}"
-    enabled: yes
+    enabled: true
     state: started
   with_items:
     - iptables
