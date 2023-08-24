@@ -4,8 +4,7 @@
     state: restarted
 
 - name: Reload sysctl
-  ansible.builtin.systemd:
-    daemon_reload: true
+  ansible.builtin.command: sysctl --system
 
 - name: Restart auditd
   ansible.builtin.systemd:
