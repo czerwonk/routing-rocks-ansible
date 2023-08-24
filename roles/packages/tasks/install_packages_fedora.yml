@@ -1,4 +1,4 @@
 - name: Install packages
   ansible.builtin.dnf:
-    name: "{{ packages_fedora }}" 
+    name: "{{ packages_fedora }}"
     state: present

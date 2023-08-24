@@ -13,23 +13,23 @@
 
 - name: Ensure caddy config directory exists
   ansible.builtin.file:
-    path: /etc/caddy 
-    owner: caddy 
-    mode: '500' 
-    state: directory 
+    path: /etc/caddy
+    owner: caddy
+    mode: '500'
+    state: directory
 
 - name: Ensure CADDYPATH directory exists
   ansible.builtin.file:
-    path: /var/caddy 
-    owner: caddy 
-    mode: '700' 
-    state: directory 
+    path: /var/caddy
+    owner: caddy
+    mode: '700'
+    state: directory
 
-- name: Ensure caddy is configured 
+- name: Ensure caddy is configured
   ansible.builtin.template:
-    src: Caddyfile.j2 
-    dest: /etc/caddy/Caddyfile 
-    owner: caddy 
+    src: Caddyfile.j2
+    dest: /etc/caddy/Caddyfile
+    owner: caddy
     mode: '400'
   notify: Restart caddy
 

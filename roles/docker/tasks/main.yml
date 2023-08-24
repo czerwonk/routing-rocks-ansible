@@ -1,6 +1,6 @@
 - name: Ensure docker is installed
   ansible.builtin.dnf:
-    name: moby-engine 
+    name: moby-engine
     state: present
 
 - name: Ensure docker python lib is installed
@@ -24,7 +24,7 @@
 
 - name: Ensure docker daemon is enabled and running
   ansible.builtin.systemd:
-    name: docker 
+    name: docker
     state: started
     enabled: true
-  
+

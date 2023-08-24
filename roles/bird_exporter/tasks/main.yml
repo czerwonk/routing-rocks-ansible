@@ -8,7 +8,7 @@
 
 - name: Ensure service is configured
   ansible.builtin.copy:
-    src: bird_exporter.service 
+    src: bird_exporter.service
     dest: /lib/systemd/system/bird_exporter.service
   register: service_unit
 
@@ -19,6 +19,6 @@
 
 - name: Ensure service is enabled and started
   ansible.builtin.service:
-    name: bird_exporter 
+    name: bird_exporter
     enabled: true
     state: started

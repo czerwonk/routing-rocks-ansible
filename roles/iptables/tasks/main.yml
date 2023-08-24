@@ -5,17 +5,17 @@
 
 - name: Ensure iptables is configured
   ansible.builtin.template:
-    src: iptables.rules.j2 
-    dest: /etc/sysconfig/iptables 
-    mode: '600' 
+    src: iptables.rules.j2
+    dest: /etc/sysconfig/iptables
+    mode: '600'
     owner: root
   notify: Reload iptables
 
 - name: Ensure ip6tables is configured
   ansible.builtin.template:
-    src: ip6tables.rules.j2 
-    dest: /etc/sysconfig/ip6tables 
-    mode: '600' 
+    src: ip6tables.rules.j2
+    dest: /etc/sysconfig/ip6tables
+    mode: '600'
     owner: root
   notify: Reload ip6tables
 

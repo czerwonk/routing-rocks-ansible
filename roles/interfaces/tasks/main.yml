@@ -1,16 +1,16 @@
 - name: Ensure loopback is configured
   ansible.builtin.template:
-    src: loopback.network.j2 
-    dest: /etc/systemd/network/10-loopback.network 
-    mode: '444' 
+    src: loopback.network.j2
+    dest: /etc/systemd/network/10-loopback.network
+    mode: '444'
     owner: root
   notify: Restart network
 
-- name: Ensure physical interfaces are configured 
+- name: Ensure physical interfaces are configured
   ansible.builtin.template:
-    src: network.j2 
-    dest: "/etc/systemd/network/20-{{ iface.name }}.network" 
-    mode: '444' 
+    src: network.j2
+    dest: "/etc/systemd/network/20-{{ iface.name }}.network"
+    mode: '444'
     owner: root
   loop: "{{ interfaces }}"
   loop_control:
@@ -18,9 +18,9 @@
   notify: Restart network
 
 - ansible.builtin.template:
-    src: service.j2 
-    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service" 
-    mode: '444' 
+    src: service.j2
+    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service"
+    mode: '444'
     owner: root
   loop_control:
     loop_var: "iface"
@@ -28,11 +28,11 @@
   when: item.post_up is defined
   notify: Reload systemd
 
-- name: Ensure VLAN interfaces are configured 
+- name: Ensure VLAN interfaces are configured
   ansible.builtin.template:
-    src: vlan.j2 
-    dest: "/etc/systemd/network/20-{{ item[1].name }}.netdev" 
-    mode: '444' 
+    src: vlan.j2
+    dest: "/etc/systemd/network/20-{{ item[1].name }}.netdev"
+    mode: '444'
     owner: root
   vars:
     iface: "{{ item[1] }}"
@@ -40,9 +40,9 @@
   notify: Restart network
 
 - ansible.builtin.template:
-    src: network.j2 
-    dest: "/etc/systemd/network/30-{{ item[1].name }}.network" 
-    mode: '444' 
+    src: network.j2
+    dest: "/etc/systemd/network/30-{{ item[1].name }}.network"
+    mode: '444'
     owner: root
   vars:
     iface: "{{ item[1] }}"
@@ -51,9 +51,9 @@
   notify: Restart network
 
 - ansible.builtin.template:
-    src: service.j2 
-    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service" 
-    mode: '444' 
+    src: service.j2
+    dest: "/etc/systemd/system/network-{{ iface.name }}-postup.service"
+    mode: '444'
     owner: root
   vars:
     iface: "{{ item[1] }}"

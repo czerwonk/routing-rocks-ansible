@@ -12,7 +12,7 @@
     name: auditd
     state: restarted
 
-- name: Restart sysstat 
+- name: Restart sysstat
   ansible.builtin.systemd:
     name: sysstat
     state: restarted

@@ -1,8 +1,8 @@
 - name: Configure {{ item.name }}
   ansible.builtin.template:
-    src: wg.j2 
+    src: wg.j2
     dest: "/etc/wireguard/{{ iface.name }}.conf"
-    owner: root 
+    owner: root
     mode: '600'
 
 - name: Ensure service is enabled and started

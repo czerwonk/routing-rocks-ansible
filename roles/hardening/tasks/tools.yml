@@ -1,4 +1,4 @@
-- name: Ensure security relevant tools are installed 
+- name: Ensure security relevant tools are installed
   ansible.builtin.dnf:
     name:
       - fail2ban

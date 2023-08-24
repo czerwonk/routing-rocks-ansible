@@ -6,7 +6,7 @@
 - name: Create user account
   ansible.builtin.user:
     name: "{{ user.name }}"
-    groups: "{{ user.groups | join(',') }}" 
+    groups: "{{ user.groups | join(',') }}"
     createhome: true
     shell: "{{ user.shell }}"
     comment: "{{ user.comment }}"
@@ -14,6 +14,6 @@
 
 - name: Set authorized_keys
   ansible.builtin.authorized_key:
-    user: "{{ user.name }}" 
+    user: "{{ user.name }}"
     key: "{{ item }}"
   with_items: "{{ user.ssh_keys }}"
