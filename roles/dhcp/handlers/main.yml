@@ -1,4 +1,4 @@
----
-
 - name: Restart kea
-  service: name=kea-dhcp4 status=restarted
+  ansible.builtin.systemd:
+    name: kea-dhcp4
+    state: restarted

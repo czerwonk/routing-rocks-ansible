@@ -9,7 +9,7 @@
   register: volume_created
 
 - name: Ensure TALS are present
-  shell: docker run --rm -v routinator-tals:/home/routinator/.rpki-cache/tals nlnetlabs/routinator init -f --accept-arin-rpa
+  ansible.builtin.shell: docker run --rm -v routinator-tals:/home/routinator/.rpki-cache/tals nlnetlabs/routinator init -f --accept-arin-rpa
   when: volume_created.changed
 
 - name: Ensure routinator is running
@@ -17,8 +17,8 @@
     name: routinator
     image: nlnetlabs/routinator
     ports:
-    - "127.0.0.1:3323:3323"
+      - "127.0.0.1:3323:3323"
     restart_policy: always
     state: started
     volumes:
-    - routinator-tals:/home/routinator/.rpki-cache/tals
+      - routinator-tals:/home/routinator/.rpki-cache/tals

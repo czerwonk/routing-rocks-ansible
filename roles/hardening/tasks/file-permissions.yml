@@ -1,17 +1,17 @@
 - name: Ensure correct permissions for system files
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     owner: root
     group: root
     mode: 0600
   with_items:
-  - /etc/crontab
-  - /boot/grub2/grub.cfg
-  - /etc/ssh/sshd_config
-  - /etc/at.deny
+    - /etc/crontab
+    - /boot/grub2/grub.cfg
+    - /etc/ssh/sshd_config
+    - /etc/at.deny
 
 - name: Ensure root .ssh dir is not accessible
-  file:
+  ansible.builtin.file:
     path: /root/.ssh
     state: directory
     owner: root
@@ -19,17 +19,17 @@
     mode: 0700
 
 - name: Ensure home dirs are not accessible by world
-  shell: find /home/* -maxdepth 0 -type d | xargs -I {} chmod 750 {}
+  ansible.builtin.shell: find /home/* -maxdepth 0 -type d | xargs -I {} chmod 750 {}
 
 - name: Ensure cron directories are not accessible by world
-  file:
+  ansible.builtin.file:
     path: "/etc/{{ item }}"
     state: directory
     owner: root
     mode: 0700
   with_items:
-  - cron.d
-  - cron.daily
-  - cron.hourly
-  - cron.weekly
-  - cron.monthly
+    - cron.d
+    - cron.daily
+    - cron.hourly
+    - cron.weekly
+    - cron.monthly

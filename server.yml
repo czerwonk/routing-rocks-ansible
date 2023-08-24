@@ -1,8 +1,7 @@
----
 - hosts: servers
   roles:
-  - packages
-  - users
-  - ssh
-  - tcp-bbr
-  - hardening
+    - packages
+    - users
+    - ssh
+    - tcp-bbr
+    - hardening

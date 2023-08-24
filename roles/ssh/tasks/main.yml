@@ -1,5 +1,7 @@
----
-
 - name: Configure sshd daemon
-  template: src=sshd_config.j2 dest=/etc/ssh/sshd_config mode=0644 owner=root
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: 0644
+    owner: root
   notify: Restart sshd

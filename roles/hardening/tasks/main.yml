@@ -1,27 +1,27 @@
 - name: Ensure hosts file is correct
-  template:
+  ansible.builtin.template:
     src: hosts.j2
     dest: /etc/hosts
 
 - name: Ensure legal banner exists
-  template:
+  ansible.builtin.template:
     src: issue.j2
     dest: /etc/issue
 
 - name: Ensure issue.net does not exist
-  file:
+  ansible.builtin.file:
     path: /etc/issue.net
     state: absent
 
-- include: updates.yml
+- ansible.builtin.include: updates.yml
 
-- include: tools.yml
+- ansible.builtin.include: tools.yml
 
-- include: file-permissions.yml
+- ansible.builtin.include: file-permissions.yml
 
-- include: coredump.yml
+- ansible.builtin.include: coredump.yml
 
-- include: kernel.yml
+- ansible.builtin.include: kernel.yml
 
-- include: compilers.yml
+- ansible.builtin.include: compilers.yml
 

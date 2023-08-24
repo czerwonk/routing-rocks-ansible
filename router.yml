@@ -1,18 +1,17 @@
----
 - hosts: routers
   roles:
-  - packages
-  - docker
-  - users
-  - ssh
-  - interfaces
-  - forwarding
-  - iptables
-  - routinator
-  - routing-policy
-  - node_exporter
-  - bird_exporter
-  - wireguard
-  - { role: dhcp, when: dhcp is defined }
-  - tcp-bbr
-  - hardening
+    - packages
+    - docker
+    - users
+    - ssh
+    - interfaces
+    - forwarding
+    - iptables
+    - routinator
+    - routing-policy
+    - node_exporter
+    - bird_exporter
+    - wireguard
+    - { role: dhcp, when: dhcp is defined }
+    - tcp-bbr
+    - hardening

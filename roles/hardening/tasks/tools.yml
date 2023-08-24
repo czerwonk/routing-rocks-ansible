@@ -1,22 +1,22 @@
 - name: Ensure security relevant tools are installed 
-  dnf:
+  ansible.builtin.dnf:
     name:
-    - fail2ban
-    - sysstat
-    - rkhunter
-    - libpwquality
-    - openscap-scanner
+      - fail2ban
+      - sysstat
+      - rkhunter
+      - libpwquality
+      - openscap-scanner
     state: present
 
 - name: Ensure fail2ban is configured
-  template:
+  ansible.builtin.template:
     src: jail.local.j2
     dest: /etc/fail2ban/jail.local
     mode: 644
   notify: Restart fail2ban
 
 - name: Ensure auditd is configured
-  copy:
+  ansible.builtin.copy:
     src: audit.rules
     dest: /etc/audit/rules.d/log-root.rules
     owner: root
@@ -25,13 +25,13 @@
   notify: Restart auditd
 
 - name: Ensure system is enabled
-  copy:
+  ansible.builtin.copy:
     content: 'ENABLED=”true”'
     dest: /etc/default/sysstat
   notify: Restart sysstat
 
 - name: Ensure sysstat daemon is enabled
-  systemd:
+  ansible.builtin.systemd:
     name: sysstat
     state: started
     enabled: yes

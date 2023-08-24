@@ -1,24 +1,24 @@
 
 - name: Ensure bird_exporter is installed
-  unarchive:
+  ansible.builtin.unarchive:
     src: https://github.com/czerwonk/bird_exporter/releases/download/{{ bird_exporter_version }}/bird_exporter_{{ bird_exporter_version }}_linux_amd64.tar.gz
     dest: /usr/local/bin/
     remote_src: yes
   notify: Restart bird_exporter
 
 - name: Ensure service is configured
-  copy: 
+  ansible.builtin.copy: 
     src: bird_exporter.service 
     dest: /lib/systemd/system/bird_exporter.service
   register: service_unit
 
 - name: Reload systemd
-  systemd: 
+  ansible.builtin.systemd: 
     daemon_reload: yes
   when: service_unit.changed
 
 - name: Ensure service is enabled and started
-  service: 
+  ansible.builtin.service: 
     name: bird_exporter 
     enabled: yes
     state: started

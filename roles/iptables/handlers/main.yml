@@ -1,7 +1,5 @@
----
-
 - name: Reload iptables
-  shell: iptables-restore /etc/sysconfig/iptables
+  ansible.builtin.shell: iptables-restore /etc/sysconfig/iptables
 
 - name: Reload ip6tables
-  shell: ip6tables-restore /etc/sysconfig/ip6tables
+  ansible.builtin.shell: ip6tables-restore /etc/sysconfig/ip6tables

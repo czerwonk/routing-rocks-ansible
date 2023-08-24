@@ -1,16 +1,16 @@
 - name: Ensure dnf-automatic is installed
-  dnf:
+  ansible.builtin.dnf:
     name: dnf-automatic
     state: present
 
 - name: Ensure dnf-automatic is configured
-  copy:
+  ansible.builtin.copy:
     src: dnf-automatic.conf
     dest: /etc/dnf/automatic.conf
     owner: root
     mode: 0600
 
 - name: Ensure dnf-automatic is enabled and running
-  systemd:
+  ansible.builtin.systemd:
     name: dnf-automatic.timer
     enabled: yes

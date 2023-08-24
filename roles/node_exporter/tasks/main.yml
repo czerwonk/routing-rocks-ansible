@@ -1,16 +1,21 @@
----
-
 - name: Ensure newest version of node exporter is installed
-  shell: "{{ go_path }}/go get github.com/prometheus/node_exporter"
+  ansible.builtin.shell: "{{ go_path }}/go get github.com/prometheus/node_exporter"
   environment: 
     GOPATH: /usr/local
-    GO15VENDOREXPERIMENT: 1 
 
-- stat: path=/bin/systemctl
-  register: systemd
+- name: Create systemd unit
+  ansible.builtin.copy:
+    src: systemd.service
+    dest: /etc/systemd/system/node_exporter.service
+  register: systemd_unit
 
-- include_tasks: configure_initd.yml
-  when: not systemd.stat.exists
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  when: systemd_unit.changed
 
-- include_tasks: configure_systemd.yml
-  when: systemd.stat.exists    
+- name: Ensure service is enabled and started
+  ansible.builtin.systemd:
+    name: node_exporter
+    state: started
+    enabled: yes

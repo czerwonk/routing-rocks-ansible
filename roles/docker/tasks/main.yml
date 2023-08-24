@@ -1,29 +1,29 @@
 - name: Ensure docker is installed
-  dnf: 
+  ansible.builtin.dnf: 
     name: moby-engine 
     state: present
 
 - name: Ensure docker python lib is installed
-  dnf:
+  ansible.builtin.dnf:
     name: python3-docker
     state: present
 
 - name: Ensure docker directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/docker/
     mode: 0500
     owner: root
     state: directory
 
 - name: Ensure docker is configured
-  copy:
+  ansible.builtin.copy:
     src: daemon.json
     dest: /etc/docker/daemon.json
     owner: root
     mode: 0400
 
 - name: Ensure docker daemon is enabled and running
-  service: 
+  ansible.builtin.systemd: 
     name: docker 
     state: started
     enabled: yes

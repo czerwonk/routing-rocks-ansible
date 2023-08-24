@@ -1,5 +1,5 @@
 - name: Ensure newest caddy version is installed
-  shell: "{{ go_path }}/go get -u github.com/mholt/caddy/caddy"
+  ansible.builtin.shell: "{{ go_path }}/go get -u github.com/mholt/caddy/caddy"
   environment:
     GOPATH: /usr/local
   tags:
@@ -7,26 +7,26 @@
   notify: Restart caddy
 
 - name: Ensure caddy user exists
-  user:
+  ansible.builtin.user:
     name: caddy
     system: yes
 
 - name: Ensure caddy config directory exists
-  file: 
+  ansible.builtin.file: 
     path: /etc/caddy 
     owner: caddy 
     mode: 0500 
     state: directory 
 
 - name: Ensure CADDYPATH directory exists
-  file: 
+  ansible.builtin.file: 
     path: /var/caddy 
     owner: caddy 
     mode: 0700 
     state: directory 
 
 - name: Ensure caddy is configured 
-  template: 
+  ansible.builtin.template: 
     src: Caddyfile.j2 
     dest: /etc/caddy/Caddyfile 
     owner: caddy 
@@ -34,11 +34,15 @@
   notify: Restart caddy
 
 - name: Ensure service unit exists
-  copy: src=caddy.service dest=/lib/systemd/system/caddy.service mode=0644 owner=root
+  ansible.builtin.copy: 
+    src: caddy.service
+    dest: /lib/systemd/system/caddy.service
+    mode: 0644
+    owner: root
   register: systemd
   notify: Restart caddy
 
 - name: Reload systemd
-  systemd: 
+  ansible.builtin.systemd: 
     daemon_reload: yes
   when: systemd.changed

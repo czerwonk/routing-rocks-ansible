@@ -1,21 +1,21 @@
 - name: Ensure wireguard is installed
-  dnf: 
+  ansible.builtin.dnf: 
     name: wireguard-tools
     state: present
 
 - name: Ensure config dir exists
-  file: 
+  ansible.builtin.file: 
     path: /etc/wireguard
     state: directory
     owner: root
   register: config_dir
 
 - name: Generate keys
-  shell: wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+  ansible.builtin.shell: wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
   when: config_dir.changed
 
 - name: Ensure file permissions are set correctly
-  file: 
+  ansible.builtin.file: 
     path: /etc/wireguard/privatekey
     mode: 0400
     state: file
